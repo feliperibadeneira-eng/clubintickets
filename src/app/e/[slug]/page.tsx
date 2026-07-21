@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { currentTier, nextTier, formatUSD, formatEventDate } from "@/lib/pricing";
+import { committedUnits, expireStaleOrders } from "@/lib/orders";
 import { TicketSelector, type SelectorItem } from "./TicketSelector";
 
 export const dynamic = "force-dynamic";
@@ -24,10 +25,14 @@ export default async function EventPage({
   });
   if (!event) notFound();
 
+  await expireStaleOrders(event.id);
+  const committed = await committedUnits(event.id);
+
   const now = new Date();
   const items: SelectorItem[] = event.ticketTypes.map((tt) => {
     const tier = currentTier(tt.priceTiers, now);
     const upcoming = nextTier(tt.priceTiers, now);
+    const remaining = Math.max(0, tt.totalStock - (committed.get(tt.id) ?? 0));
     return {
       id: tt.id,
       name: tt.name,
@@ -42,9 +47,11 @@ export default async function EventPage({
               { day: "numeric", month: "long", timeZone: "America/Guayaquil" },
             ).format(upcoming.startsAt!)}`
           : null,
-      // Tope por compra; el control real de stock (con reservas) llega en el
-      // paso 4 de esta fase.
-      maxPerOrder: Math.min(10, tt.totalStock),
+      soldOut: remaining === 0,
+      // Aviso de escasez solo cuando de verdad quedan pocas.
+      lowStockNote:
+        remaining > 0 && remaining <= 20 ? `¡Quedan ${remaining}!` : null,
+      maxPerOrder: Math.min(10, remaining),
     };
   });
 

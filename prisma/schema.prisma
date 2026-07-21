@@ -57,6 +57,8 @@ model Event {
   organization Organization @relation(fields: [organizationId], references: [id])
   venue        Venue        @relation(fields: [venueId], references: [id])
   ticketTypes  TicketType[]
+  orders       Order[]
+  tickets      Ticket[]
 }
 
 // General, VIP, Combo 4 Amigos, etc. El precio vive en PriceTier (tandas).
@@ -73,6 +75,77 @@ model TicketType {
 
   event      Event       @relation(fields: [eventId], references: [id])
   priceTiers PriceTier[]
+  orderItems OrderItem[]
+  tickets    Ticket[]
+}
+
+enum OrderStatus {
+  PENDING // reserva iniciada, esperando el pago
+  PAID // pago confirmado
+  EXPIRED // no pagó a tiempo; la reserva se liberó
+  CANCELLED // cancelada manualmente
+  REFUNDED // reembolsada (gestión manual, ver SPEC.md sección 7)
+}
+
+// Una compra: quién compró, qué, a qué precio y en qué estado está.
+model Order {
+  id         String      @id @default(cuid())
+  eventId    String
+  status     OrderStatus @default(PENDING)
+  buyerName  String
+  buyerEmail String
+  totalCents Int
+  currency   String      @default("USD")
+  // Hasta cuándo vale la reserva de stock de una orden PENDING.
+  expiresAt  DateTime
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  event   Event       @relation(fields: [eventId], references: [id])
+  items   OrderItem[]
+  tickets Ticket[]
+
+  @@index([eventId, status])
+}
+
+// Detalle de la orden: cuántas unidades de cada tipo y a qué precio
+// (el precio queda "congelado" acá aunque la tanda cambie después).
+model OrderItem {
+  id             String  @id @default(cuid())
+  orderId        String
+  ticketTypeId   String
+  quantity       Int
+  unitPriceCents Int
+  tierName       String?
+
+  order      Order      @relation(fields: [orderId], references: [id])
+  ticketType TicketType @relation(fields: [ticketTypeId], references: [id])
+}
+
+enum TicketStatus {
+  PENDING // la orden todavía no se pagó
+  VALID // pagada, lista para usarse en la puerta
+  USED // ya ingresó al evento
+  REFUNDED // devuelta
+  VOID // anulada (por ejemplo, la orden expiró)
+}
+
+// Cada entrada individual, nominativa. El QR llega en la Fase 3.
+model Ticket {
+  id               String       @id @default(cuid())
+  orderId          String
+  eventId          String
+  ticketTypeId     String
+  attendeeName     String
+  attendeeIdNumber String
+  status           TicketStatus @default(PENDING)
+  createdAt        DateTime     @default(now())
+
+  order      Order      @relation(fields: [orderId], references: [id])
+  event      Event      @relation(fields: [eventId], references: [id])
+  ticketType TicketType @relation(fields: [ticketTypeId], references: [id])
+
+  @@index([eventId, status])
 }
 
 // Tanda de precio con vigencia por fechas (early bird, tanda 2, ...).

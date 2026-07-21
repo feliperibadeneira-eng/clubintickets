@@ -13,6 +13,8 @@ export type SelectorItem = {
   priceCents: number | null;
   tierName: string | null;
   priceRiseNote: string | null;
+  soldOut: boolean;
+  lowStockNote: string | null;
   maxPerOrder: number;
 };
 
@@ -56,7 +58,7 @@ export function TicketSelector({
       <ul className="space-y-3">
         {items.map((item) => {
           const qty = quantities[item.id] ?? 0;
-          const onSale = item.priceCents !== null;
+          const onSale = item.priceCents !== null && !item.soldOut;
           return (
             <li
               key={item.id}
@@ -91,10 +93,15 @@ export function TicketSelector({
                         {item.priceRiseNote}
                       </span>
                     )}
+                    {item.lowStockNote && (
+                      <span className="ml-2 text-xs font-medium text-red-600 dark:text-red-500">
+                        {item.lowStockNote}
+                      </span>
+                    )}
                   </p>
                 ) : (
                   <p className="mt-1 text-sm text-neutral-500">
-                    No disponible en este momento
+                    {item.soldOut ? "Agotada" : "No disponible en este momento"}
                   </p>
                 )}
               </div>
