@@ -10,5 +10,8 @@ export default defineConfig({
   },
   datasource: {
     url: process.env["DATABASE_URL"],
+    // El Postgres local de `prisma dev` no permite crear bases al vuelo,
+    // así que le indicamos su servidor "sombra" (necesario para migraciones).
+    shadowDatabaseUrl: process.env["SHADOW_DATABASE_URL"],
   },
 });

@@ -1,7 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// Modelo de datos de la ticketera.
+// Diseñado multi-organización desde el día uno (ver SPEC.md sección 9),
+// aunque el MVP tenga una sola organización.
 
 generator client {
   provider = "prisma-client"
@@ -10,4 +9,82 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+// La empresa/organizador dueño de la cuenta (hoy: solo Felipe).
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  venues Venue[]
+  events Event[]
+}
+
+// Un lugar físico (discoteca, salón). Una organización puede tener varios.
+model Venue {
+  id             String  @id @default(cuid())
+  organizationId String
+  name           String
+  address        String?
+  city           String
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  events       Event[]
+}
+
+enum EventStatus {
+  DRAFT // el organizador lo está armando, no es visible al público
+  PUBLISHED // visible y en venta
+  ARCHIVED // ya pasó o se canceló
+}
+
+// Una fiesta puntual.
+model Event {
+  id             String      @id @default(cuid())
+  organizationId String
+  venueId        String
+  name           String
+  slug           String      @unique
+  description    String?
+  startsAt       DateTime
+  endsAt         DateTime?
+  status         EventStatus @default(DRAFT)
+  currency       String      @default("USD")
+  createdAt      DateTime    @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  venue        Venue        @relation(fields: [venueId], references: [id])
+  ticketTypes  TicketType[]
+}
+
+// General, VIP, Combo 4 Amigos, etc. El precio vive en PriceTier (tandas).
+model TicketType {
+  id          String  @id @default(cuid())
+  eventId     String
+  name        String
+  description String?
+  // Cuántas personas entran por unidad vendida (combo "4 amigos" = 4).
+  groupSize   Int     @default(1)
+  // Unidades totales a la venta de este tipo (en combos, unidades de combo).
+  totalStock  Int
+  sortOrder   Int     @default(0)
+
+  event      Event       @relation(fields: [eventId], references: [id])
+  priceTiers PriceTier[]
+}
+
+// Tanda de precio con vigencia por fechas (early bird, tanda 2, ...).
+// La tanda vigente es la que cumple startsAt <= ahora < endsAt.
+// startsAt/endsAt en null significan "sin límite" por ese lado.
+model PriceTier {
+  id           String    @id @default(cuid())
+  ticketTypeId String
+  name         String
+  priceCents   Int // precio en centavos de USD para evitar errores de redondeo
+  startsAt     DateTime?
+  endsAt       DateTime?
+
+  ticketType TicketType @relation(fields: [ticketTypeId], references: [id])
 }

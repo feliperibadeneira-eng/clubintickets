@@ -6,11 +6,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:start": "prisma dev --name ticketera --detach",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.9.0",
     "@prisma/client": "^7.9.0",
     "next": "16.2.11",
+    "pg": "^8.22.0",
     "prisma": "^7.9.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
