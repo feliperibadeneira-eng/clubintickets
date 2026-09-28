@@ -13,7 +13,7 @@ export default async function ScanPage() {
 
   if (events.length === 0) {
     return (
-      <main className="mx-auto w-full max-w-md flex-1 px-4 py-10 text-center text-neutral-500">
+      <main className="mx-auto w-full max-w-md flex-1 px-4 py-10 text-center text-muted">
         Todavía no hay ningún evento creado para escanear.
       </main>
     );

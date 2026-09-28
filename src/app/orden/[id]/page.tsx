@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CheckCircle2, Clock, TimerOff, XCircle } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { formatUSD } from "@/lib/pricing";
+import { Card } from "@/components/ui/Card";
+import { buttonClasses } from "@/components/ui/Button";
 import { Countdown } from "./Countdown";
 import { TestPaymentButton } from "./TestPaymentButton";
 
@@ -30,49 +33,60 @@ export default async function OrderPage({
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">
-      <p className="text-sm text-neutral-500">{order.event.name}</p>
+      <p className="text-sm text-muted">{order.event.name}</p>
 
       {isExpired ? (
         <>
-          <h1 className="text-3xl font-bold">La reserva expiró</h1>
-          <p className="mt-3 text-neutral-600 dark:text-neutral-400">
+          <div className="mt-2 flex items-center gap-2.5">
+            <TimerOff className="text-danger" size={26} />
+            <h1 className="text-3xl font-bold tracking-tight">
+              La reserva expiró
+            </h1>
+          </div>
+          <p className="mt-3 text-muted">
             Pasaron más de 10 minutos sin completar el pago, así que las
             entradas volvieron a estar disponibles para otras personas. Podés
             empezar de nuevo cuando quieras.
           </p>
           <Link
             href={`/e/${order.event.slug}`}
-            className="mt-6 inline-block rounded-full bg-foreground px-6 py-3 font-medium text-background transition hover:opacity-85"
+            className={buttonClasses("primary", "lg", "mt-6")}
           >
             Volver al evento
           </Link>
         </>
       ) : order.status === "PENDING" ? (
         <>
-          <h1 className="text-3xl font-bold">¡Entradas reservadas!</h1>
-          <p className="mt-3 text-neutral-600 dark:text-neutral-400">
+          <div className="mt-2 flex items-center gap-2.5">
+            <Clock className="text-accent" size={26} />
+            <h1 className="text-3xl font-bold tracking-tight">
+              ¡Entradas reservadas!
+            </h1>
+          </div>
+          <p className="mt-3 text-muted">
             Tenés{" "}
-            <Countdown expiresAtMs={order.expiresAt.getTime()} /> para
-            completar el pago. Pasado ese tiempo, la reserva se libera.
+            <span className="font-semibold text-foreground">
+              <Countdown expiresAtMs={order.expiresAt.getTime()} />
+            </span>{" "}
+            para completar el pago. Pasado ese tiempo, la reserva se libera.
           </p>
 
           <ul className="mt-6 space-y-2">
             {order.items.map((item) => (
-              <li
-                key={item.id}
-                className="flex justify-between rounded-lg border border-neutral-200 p-4 dark:border-neutral-800"
-              >
-                <span>
-                  {item.quantity} × {item.ticketType.name}
-                  {item.tierName && (
-                    <span className="ml-2 text-xs text-neutral-500">
-                      {item.tierName}
-                    </span>
-                  )}
-                </span>
-                <span className="font-medium">
-                  {formatUSD(item.unitPriceCents * item.quantity)}
-                </span>
+              <li key={item.id}>
+                <Card className="flex justify-between py-3">
+                  <span>
+                    {item.quantity} × {item.ticketType.name}
+                    {item.tierName && (
+                      <span className="ml-2 text-xs text-muted">
+                        {item.tierName}
+                      </span>
+                    )}
+                  </span>
+                  <span className="font-medium">
+                    {formatUSD(item.unitPriceCents * item.quantity)}
+                  </span>
+                </Card>
               </li>
             ))}
           </ul>
@@ -80,34 +94,37 @@ export default async function OrderPage({
             Total: {formatUSD(order.totalCents)}
           </p>
 
-          <section className="mt-4 rounded-xl border border-neutral-200 p-4 dark:border-neutral-800">
-            <h2 className="text-sm font-semibold text-neutral-500">
-              Asistentes
-            </h2>
+          <Card className="mt-4">
+            <h2 className="text-sm font-semibold text-muted">Asistentes</h2>
             <ul className="mt-2 space-y-1 text-sm">
               {order.tickets.map((t) => (
                 <li key={t.id} className="flex justify-between">
                   <span>{t.attendeeName}</span>
-                  <span className="text-neutral-500">
+                  <span className="text-muted">
                     {t.ticketType.name} · {t.attendeeIdNumber}
                   </span>
                 </li>
               ))}
             </ul>
-          </section>
+          </Card>
 
           <TestPaymentButton orderId={order.id} />
         </>
       ) : order.status === "PAID" ? (
         <>
-          <h1 className="text-3xl font-bold">¡Gracias por tu compra!</h1>
+          <div className="mt-2 flex items-center gap-2.5">
+            <CheckCircle2 className="text-success" size={26} />
+            <h1 className="text-3xl font-bold tracking-tight">
+              ¡Gracias por tu compra!
+            </h1>
+          </div>
           {order.emailSentAt ? (
-            <p className="mt-3 text-neutral-600 dark:text-neutral-400">
+            <p className="mt-3 text-muted">
               Tu pago está confirmado y te mandamos tus entradas a{" "}
-              <strong>{order.buyerEmail}</strong>.
+              <strong className="text-foreground">{order.buyerEmail}</strong>.
             </p>
           ) : (
-            <p className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+            <p className="mt-3 rounded-xl border border-warning/25 bg-warning-bg p-3 text-sm text-warning">
               Tu pago está confirmado, pero no pudimos enviarte el email con
               las entradas. No hay problema: podés verlas y guardarlas desde
               acá abajo.
@@ -116,16 +133,15 @@ export default async function OrderPage({
 
           <ul className="mt-6 space-y-2">
             {order.items.map((item) => (
-              <li
-                key={item.id}
-                className="flex justify-between rounded-lg border border-neutral-200 p-4 dark:border-neutral-800"
-              >
-                <span>
-                  {item.quantity} × {item.ticketType.name}
-                </span>
-                <span className="font-medium">
-                  {formatUSD(item.unitPriceCents * item.quantity)}
-                </span>
+              <li key={item.id}>
+                <Card className="flex justify-between py-3">
+                  <span>
+                    {item.quantity} × {item.ticketType.name}
+                  </span>
+                  <span className="font-medium">
+                    {formatUSD(item.unitPriceCents * item.quantity)}
+                  </span>
+                </Card>
               </li>
             ))}
           </ul>
@@ -133,11 +149,11 @@ export default async function OrderPage({
             Total: {formatUSD(order.totalCents)}
           </p>
 
-          <section className="mt-4 rounded-xl border border-neutral-200 p-4 dark:border-neutral-800">
-            <h2 className="text-sm font-semibold text-neutral-500">
+          <Card className="mt-4">
+            <h2 className="text-sm font-semibold text-muted">
               Tus entradas
             </h2>
-            <ul className="mt-2 space-y-2 text-sm">
+            <ul className="mt-3 space-y-2 text-sm">
               {order.tickets.map((t) => (
                 <li
                   key={t.id}
@@ -145,25 +161,30 @@ export default async function OrderPage({
                 >
                   <span>
                     {t.attendeeName}
-                    <span className="ml-2 text-neutral-500">
+                    <span className="ml-2 text-muted">
                       {t.ticketType.name} · {t.attendeeIdNumber}
                     </span>
                   </span>
                   <Link
                     href={`/t/${t.qrToken}`}
-                    className="shrink-0 rounded-full border border-neutral-300 px-3 py-1 text-xs font-medium transition hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                    className={buttonClasses("secondary", "sm", "shrink-0")}
                   >
                     Ver entrada
                   </Link>
                 </li>
               ))}
             </ul>
-          </section>
+          </Card>
         </>
       ) : (
         <>
-          <h1 className="text-3xl font-bold">Orden no disponible</h1>
-          <p className="mt-3 text-neutral-600 dark:text-neutral-400">
+          <div className="mt-2 flex items-center gap-2.5">
+            <XCircle className="text-danger" size={26} />
+            <h1 className="text-3xl font-bold tracking-tight">
+              Orden no disponible
+            </h1>
+          </div>
+          <p className="mt-3 text-muted">
             Esta orden fue cancelada o reembolsada.
           </p>
         </>

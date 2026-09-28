@@ -49,7 +49,7 @@ export default async function CheckoutPage({
         <h1 className="text-3xl font-bold">Nada seleccionado</h1>
         <Link
           href={`/e/${slug}`}
-          className="mt-4 inline-block underline underline-offset-4"
+          className="mt-4 inline-block text-accent underline underline-offset-4"
         >
           ← Volver al evento
         </Link>
@@ -64,17 +64,18 @@ export default async function CheckoutPage({
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">
-      <h1 className="text-3xl font-bold">Datos de los asistentes</h1>
-      <p className="mt-1 text-sm text-neutral-500">{event.name}</p>
-
-      <CheckoutForm eventSlug={slug} items={items} totalCents={totalCents} />
-
       <Link
         href={`/e/${slug}`}
-        className="mt-6 inline-block text-sm underline underline-offset-4"
+        className="text-sm text-muted underline underline-offset-4 hover:text-foreground"
       >
         ← Cambiar mi selección
       </Link>
+      <h1 className="mt-3 text-3xl font-bold tracking-tight">
+        Datos de los asistentes
+      </h1>
+      <p className="mt-1 text-sm text-muted">{event.name}</p>
+
+      <CheckoutForm eventSlug={slug} items={items} totalCents={totalCents} />
     </main>
   );
 }

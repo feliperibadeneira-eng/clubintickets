@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { CalendarDays, MapPin } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { currentTier, nextTier, formatUSD, formatEventDate } from "@/lib/pricing";
 import { committedUnits, expireStaleOrders } from "@/lib/orders";
@@ -56,25 +57,39 @@ export default async function EventPage({
   });
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">
-      <p className="text-sm text-neutral-500">{event.organization.name}</p>
-      <h1 className="text-3xl font-bold">{event.name}</h1>
-      <div className="mt-2 space-y-0.5 text-sm text-neutral-500">
-        <p>{formatEventDate(event.startsAt)}</p>
-        <p>
-          {event.venue.name}
-          {event.venue.address ? ` — ${event.venue.address}` : ""} ·{" "}
-          {event.venue.city}
-        </p>
+    <main className="flex-1">
+      <div className="border-b border-border/60 bg-gradient-to-br from-accent/20 via-background to-background px-4 py-12">
+        <div className="mx-auto w-full max-w-2xl">
+          <p className="text-sm font-medium text-accent">
+            {event.organization.name}
+          </p>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl">
+            {event.name}
+          </h1>
+          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-muted">
+            <span className="inline-flex items-center gap-1.5">
+              <CalendarDays size={15} className="text-muted-2" />
+              {formatEventDate(event.startsAt)}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin size={15} className="text-muted-2" />
+              {event.venue.name}
+              {event.venue.address ? ` — ${event.venue.address}` : ""} ·{" "}
+              {event.venue.city}
+            </span>
+          </div>
+          {event.description && (
+            <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-muted">
+              {event.description}
+            </p>
+          )}
+        </div>
       </div>
-      {event.description && (
-        <p className="mt-4 text-neutral-700 dark:text-neutral-300">
-          {event.description}
-        </p>
-      )}
 
-      <h2 className="mt-10 text-xl font-semibold">Entradas</h2>
-      <TicketSelector eventSlug={event.slug} items={items} />
+      <div className="mx-auto w-full max-w-2xl px-4 py-10">
+        <h2 className="text-xl font-semibold tracking-tight">Entradas</h2>
+        <TicketSelector eventSlug={event.slug} items={items} />
+      </div>
     </main>
   );
 }

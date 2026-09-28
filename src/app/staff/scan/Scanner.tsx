@@ -2,9 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { Html5Qrcode as Html5QrcodeType } from "html5-qrcode";
+import { CheckCircle2, XCircle, CameraOff } from "lucide-react";
 import { scanTicket } from "./actions";
 import { logout } from "@/lib/session-actions";
 import type { EventOption, CheckInResult } from "@/lib/checkin";
+import { Button } from "@/components/ui/Button";
 
 const READER_ID = "qr-reader";
 
@@ -88,26 +90,25 @@ export function Scanner({
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 py-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-neutral-500">Conectado como</p>
-          <p className="font-medium">{staffName}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs text-muted">Conectado como</p>
+          <p className="break-words font-medium">{staffName}</p>
         </div>
-        <form action={logout}>
-          <button
-            type="submit"
-            className="rounded-full border border-neutral-300 px-3 py-1.5 text-sm dark:border-neutral-700"
-          >
+        <form action={logout} className="shrink-0">
+          <Button type="submit" variant="secondary" size="sm">
             Cerrar sesión
-          </button>
+          </Button>
         </form>
       </div>
 
-      <label className="mt-4 block text-sm font-medium">Evento</label>
+      <label className="mt-5 block text-sm font-medium text-muted">
+        Evento
+      </label>
       <select
         value={eventId}
         onChange={(e) => setEventId(e.target.value)}
-        className="mt-1 w-full rounded-lg border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-700"
+        className="mt-1.5 w-full rounded-xl border border-border bg-background-alt px-3.5 py-2.5 text-foreground outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/25"
       >
         {events.map((e) => (
           <option key={e.id} value={e.id}>
@@ -116,24 +117,21 @@ export function Scanner({
         ))}
       </select>
 
-      <div className="relative mt-4 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800">
+      <div className="relative mt-4 overflow-hidden rounded-2xl border border-border bg-surface">
         <div id={READER_ID} className="w-full" />
         {cameraError && (
-          <div className="p-4 text-center text-sm text-red-600 dark:text-red-400">
+          <div className="flex flex-col items-center gap-2 p-6 text-center text-sm text-danger">
+            <CameraOff size={22} />
             No pudimos acceder a la cámara: {cameraError}. Revisá los
             permisos de cámara del navegador para este sitio.
           </div>
         )}
       </div>
 
-      {result && (
-        <ResultPanel result={result} onDismiss={resumeScanning} />
-      )}
+      {result && <ResultPanel result={result} onDismiss={resumeScanning} />}
 
       {paused && !result && (
-        <p className="mt-4 text-center text-sm text-neutral-500">
-          Procesando…
-        </p>
+        <p className="mt-4 text-center text-sm text-muted">Procesando…</p>
       )}
     </div>
   );
@@ -148,16 +146,11 @@ function ResultPanel({
 }) {
   if (result.result === "GRANTED") {
     return (
-      <div className="mt-4 rounded-xl bg-green-100 p-5 text-center dark:bg-green-950">
-        <p className="text-lg font-bold text-green-800 dark:text-green-300">
-          ✓ Entrada válida
-        </p>
-        <p className="mt-1 text-green-900 dark:text-green-200">
-          {result.attendeeName}
-        </p>
-        <p className="text-sm text-green-700 dark:text-green-400">
-          {result.ticketTypeName}
-        </p>
+      <div className="mt-4 rounded-2xl border border-success/25 bg-success-bg p-6 text-center">
+        <CheckCircle2 className="mx-auto text-success" size={34} />
+        <p className="mt-2 text-lg font-bold text-success">Entrada válida</p>
+        <p className="mt-1 font-medium">{result.attendeeName}</p>
+        <p className="text-sm text-muted">{result.ticketTypeName}</p>
         <DismissButton onDismiss={onDismiss} />
       </div>
     );
@@ -165,14 +158,13 @@ function ResultPanel({
 
   if (result.result === "ALREADY_USED") {
     return (
-      <div className="mt-4 rounded-xl bg-red-100 p-5 text-center dark:bg-red-950">
-        <p className="text-lg font-bold text-red-800 dark:text-red-300">
-          ✕ Entrada ya usada
-        </p>
-        <p className="mt-1 text-red-900 dark:text-red-200">
+      <div className="mt-4 rounded-2xl border border-danger/25 bg-danger-bg p-6 text-center">
+        <XCircle className="mx-auto text-danger" size={34} />
+        <p className="mt-2 text-lg font-bold text-danger">Entrada ya usada</p>
+        <p className="mt-1 font-medium">
           {result.attendeeName} · {result.ticketTypeName}
         </p>
-        <p className="text-sm text-red-700 dark:text-red-400">
+        <p className="text-sm text-muted">
           Ingresó a las{" "}
           {new Intl.DateTimeFormat("es-EC", {
             timeStyle: "medium",
@@ -186,13 +178,10 @@ function ResultPanel({
   }
 
   return (
-    <div className="mt-4 rounded-xl bg-red-100 p-5 text-center dark:bg-red-950">
-      <p className="text-lg font-bold text-red-800 dark:text-red-300">
-        ✕ No válida
-      </p>
-      <p className="mt-1 text-sm text-red-700 dark:text-red-400">
-        {result.reason}
-      </p>
+    <div className="mt-4 rounded-2xl border border-danger/25 bg-danger-bg p-6 text-center">
+      <XCircle className="mx-auto text-danger" size={34} />
+      <p className="mt-2 text-lg font-bold text-danger">No válida</p>
+      <p className="mt-1 text-sm text-muted">{result.reason}</p>
       <DismissButton onDismiss={onDismiss} />
     </div>
   );
@@ -200,12 +189,8 @@ function ResultPanel({
 
 function DismissButton({ onDismiss }: { onDismiss: () => void }) {
   return (
-    <button
-      type="button"
-      onClick={onDismiss}
-      className="mt-4 rounded-full bg-foreground px-6 py-2 font-medium text-background transition hover:opacity-85"
-    >
+    <Button onClick={onDismiss} className="mt-4">
       Escanear siguiente
-    </button>
+    </Button>
   );
 }

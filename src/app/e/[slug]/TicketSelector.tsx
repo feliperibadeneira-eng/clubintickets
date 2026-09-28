@@ -2,7 +2,11 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Minus, Plus } from "lucide-react";
 import { formatUSD } from "@/lib/pricing";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 
 export type SelectorItem = {
   id: string;
@@ -54,89 +58,86 @@ export function TicketSelector({
   };
 
   return (
-    <div className="mt-4">
+    <div className="mt-5">
       <ul className="space-y-3">
         {items.map((item) => {
           const qty = quantities[item.id] ?? 0;
           const onSale = item.priceCents !== null && !item.soldOut;
           return (
-            <li
-              key={item.id}
-              className="flex items-center justify-between gap-4 rounded-xl border border-neutral-200 p-4 dark:border-neutral-800"
-            >
-              <div className="min-w-0">
-                <p className="font-medium">
-                  {item.name}
-                  {item.groupSize > 1 && (
-                    <span className="ml-2 text-xs text-neutral-500">
-                      ({item.groupSize} personas)
-                    </span>
+            <li key={item.id}>
+              <Card
+                className={`flex items-center justify-between gap-4 ${qty > 0 ? "border-accent/40 ring-1 ring-accent/20" : ""}`}
+              >
+                <div className="min-w-0">
+                  <p className="font-medium">
+                    {item.name}
+                    {item.groupSize > 1 && (
+                      <span className="ml-2 text-xs text-muted">
+                        ({item.groupSize} personas)
+                      </span>
+                    )}
+                  </p>
+                  {item.description && (
+                    <p className="mt-0.5 text-sm text-muted">
+                      {item.description}
+                    </p>
                   )}
-                </p>
-                {item.description && (
-                  <p className="mt-0.5 text-sm text-neutral-500">
-                    {item.description}
-                  </p>
-                )}
-                {onSale ? (
-                  <p className="mt-1 text-sm">
-                    <span className="font-semibold">
-                      {formatUSD(item.priceCents!)}
-                    </span>
-                    {item.tierName && (
-                      <span className="ml-2 text-xs text-neutral-500">
-                        {item.tierName}
+                  {onSale ? (
+                    <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                      <span className="font-semibold text-foreground">
+                        {formatUSD(item.priceCents!)}
                       </span>
-                    )}
-                    {item.priceRiseNote && (
-                      <span className="ml-2 text-xs text-amber-600 dark:text-amber-500">
-                        {item.priceRiseNote}
-                      </span>
-                    )}
-                    {item.lowStockNote && (
-                      <span className="ml-2 text-xs font-medium text-red-600 dark:text-red-500">
-                        {item.lowStockNote}
-                      </span>
-                    )}
-                  </p>
-                ) : (
-                  <p className="mt-1 text-sm text-neutral-500">
-                    {item.soldOut ? "Agotada" : "No disponible en este momento"}
-                  </p>
-                )}
-              </div>
-
-              {onSale && (
-                <div className="flex shrink-0 items-center gap-3">
-                  <button
-                    type="button"
-                    aria-label={`Quitar una entrada ${item.name}`}
-                    onClick={() => setQty(item.id, qty - 1, item.maxPerOrder)}
-                    disabled={qty === 0}
-                    className="h-9 w-9 rounded-full border border-neutral-300 text-lg leading-none transition enabled:hover:bg-neutral-100 disabled:opacity-30 dark:border-neutral-700 dark:enabled:hover:bg-neutral-800"
-                  >
-                    −
-                  </button>
-                  <span className="w-6 text-center tabular-nums">{qty}</span>
-                  <button
-                    type="button"
-                    aria-label={`Agregar una entrada ${item.name}`}
-                    onClick={() => setQty(item.id, qty + 1, item.maxPerOrder)}
-                    disabled={qty >= item.maxPerOrder}
-                    className="h-9 w-9 rounded-full border border-neutral-300 text-lg leading-none transition enabled:hover:bg-neutral-100 disabled:opacity-30 dark:border-neutral-700 dark:enabled:hover:bg-neutral-800"
-                  >
-                    +
-                  </button>
+                      {item.tierName && (
+                        <Badge tone="neutral">{item.tierName}</Badge>
+                      )}
+                      {item.priceRiseNote && (
+                        <Badge tone="warning">{item.priceRiseNote}</Badge>
+                      )}
+                      {item.lowStockNote && (
+                        <Badge tone="danger">{item.lowStockNote}</Badge>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="mt-1 text-sm text-muted">
+                      {item.soldOut ? "Agotada" : "No disponible en este momento"}
+                    </p>
+                  )}
                 </div>
-              )}
+
+                {onSale && (
+                  <div className="flex shrink-0 items-center gap-3">
+                    <button
+                      type="button"
+                      aria-label={`Quitar una entrada ${item.name}`}
+                      onClick={() => setQty(item.id, qty - 1, item.maxPerOrder)}
+                      disabled={qty === 0}
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-border transition enabled:hover:border-border-hover enabled:hover:bg-surface-hover disabled:opacity-30"
+                    >
+                      <Minus size={15} />
+                    </button>
+                    <span className="w-5 text-center font-medium tabular-nums">
+                      {qty}
+                    </span>
+                    <button
+                      type="button"
+                      aria-label={`Agregar una entrada ${item.name}`}
+                      onClick={() => setQty(item.id, qty + 1, item.maxPerOrder)}
+                      disabled={qty >= item.maxPerOrder}
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-border transition enabled:hover:border-border-hover enabled:hover:bg-surface-hover disabled:opacity-30"
+                    >
+                      <Plus size={15} />
+                    </button>
+                  </div>
+                )}
+              </Card>
             </li>
           );
         })}
       </ul>
 
-      <div className="mt-6 flex items-center justify-between rounded-xl bg-neutral-100 p-4 dark:bg-neutral-900">
+      <div className="sticky bottom-4 mt-6 flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xl">
         <div>
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-muted">
             {totalTickets === 0
               ? "Ninguna entrada seleccionada"
               : totalTickets === 1
@@ -145,14 +146,13 @@ export function TicketSelector({
           </p>
           <p className="text-xl font-bold">{formatUSD(totalCents)}</p>
         </div>
-        <button
-          type="button"
+        <Button
+          size="lg"
           onClick={continueToCheckout}
           disabled={totalTickets === 0}
-          className="rounded-full bg-foreground px-6 py-3 font-medium text-background transition enabled:hover:opacity-85 disabled:opacity-40"
         >
           Continuar
-        </button>
+        </Button>
       </div>
     </div>
   );

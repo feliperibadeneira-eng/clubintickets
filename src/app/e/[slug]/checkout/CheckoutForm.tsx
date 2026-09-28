@@ -4,6 +4,9 @@ import { useActionState } from "react";
 import { submitOrder, type CheckoutFormState } from "./actions";
 import type { SelectionInput } from "@/lib/orders";
 import { formatUSD } from "@/lib/pricing";
+import { Card } from "@/components/ui/Card";
+import { Input, Label } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 
 export type CheckoutItem = {
   ticketTypeId: string;
@@ -39,85 +42,82 @@ export function CheckoutForm({
 
   return (
     <form action={formAction} className="mt-6">
-      <section className="rounded-xl border border-neutral-200 p-4 dark:border-neutral-800">
+      <Card>
         <h2 className="font-semibold">Tus datos (comprador)</h2>
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1 text-sm text-muted">
           Acá te enviaremos las entradas.
         </p>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <input
-            name="buyerName"
-            required
-            placeholder="Tu nombre completo"
-            className="rounded-lg border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-700"
-          />
-          <input
-            name="buyerEmail"
-            type="email"
-            required
-            placeholder="tu@email.com"
-            className="rounded-lg border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-700"
-          />
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <Label htmlFor="buyerName">Nombre completo</Label>
+            <Input
+              id="buyerName"
+              name="buyerName"
+              required
+              placeholder="Tu nombre completo"
+            />
+          </div>
+          <div>
+            <Label htmlFor="buyerEmail">Email</Label>
+            <Input
+              id="buyerEmail"
+              name="buyerEmail"
+              type="email"
+              required
+              placeholder="tu@email.com"
+            />
+          </div>
         </div>
-      </section>
+      </Card>
 
       {items.map((item) => (
-        <section
-          key={item.ticketTypeId}
-          className="mt-4 rounded-xl border border-neutral-200 p-4 dark:border-neutral-800"
-        >
+        <Card key={item.ticketTypeId} className="mt-4">
           <h2 className="font-semibold">
             {item.name}{" "}
-            <span className="text-sm font-normal text-neutral-500">
+            <span className="text-sm font-normal text-muted">
               — {item.quantity} × {formatUSD(item.unitPriceCents)}
               {item.groupSize > 1 && ` (${item.groupSize} personas c/u)`}
             </span>
           </h2>
-          <p className="mt-1 text-sm text-neutral-500">
+          <p className="mt-1 text-sm text-muted">
             Las entradas son nominativas: nombre y cédula/pasaporte de cada
             persona, tal como figura en su documento.
           </p>
-          <div className="mt-3 space-y-2">
+          <div className="mt-4 space-y-3">
             {Array.from({ length: item.quantity * item.groupSize }, (_, i) => (
-              <div key={i} className="grid gap-2 sm:grid-cols-2">
-                <input
+              <div key={i} className="grid gap-3 sm:grid-cols-2">
+                <Input
                   name={`attendee-${item.ticketTypeId}-${i}-name`}
                   required
                   minLength={3}
                   placeholder={`Asistente ${i + 1}: nombre completo`}
-                  className="rounded-lg border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-700"
                 />
-                <input
+                <Input
                   name={`attendee-${item.ticketTypeId}-${i}-id`}
                   required
                   pattern="[0-9A-Za-z\-]{5,20}"
                   title="Cédula o pasaporte: 5 a 20 letras o números"
                   placeholder="Cédula o pasaporte"
-                  className="rounded-lg border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-700"
                 />
               </div>
             ))}
           </div>
-        </section>
+        </Card>
       ))}
 
       {state?.error && (
-        <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+        <p className="mt-4 rounded-xl border border-danger/25 bg-danger-bg p-3 text-sm text-danger">
           {state.error}
         </p>
       )}
 
-      <div className="mt-6 flex items-center justify-between rounded-xl bg-neutral-100 p-4 dark:bg-neutral-900">
+      <div className="mt-6 flex items-center justify-between rounded-2xl border border-border bg-surface p-4">
         <p className="text-xl font-bold">Total: {formatUSD(totalCents)}</p>
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded-full bg-foreground px-6 py-3 font-medium text-background transition enabled:hover:opacity-85 disabled:opacity-40"
-        >
+        <Button type="submit" size="lg" disabled={pending}>
           {pending ? "Reservando…" : "Continuar al pago"}
-        </button>
+        </Button>
       </div>
-      <p className="mt-2 text-right text-xs text-neutral-500">
+      <p className="mt-2 text-right text-xs text-muted">
         Al continuar, tus entradas quedan reservadas por 10 minutos mientras
         completás el pago.
       </p>

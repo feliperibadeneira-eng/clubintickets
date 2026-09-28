@@ -103,7 +103,7 @@ async function main() {
   await prisma.user.create({
     data: {
       organizationId: org.id,
-      name: "Felipe (organizador)",
+      name: "Felipe Ribadeneira",
       email: "felipe@demo-producciones.test",
       passwordHash: await hashPassword(ORGANIZER_PASSWORD),
       role: "ORGANIZER",

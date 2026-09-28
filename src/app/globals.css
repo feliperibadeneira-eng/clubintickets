@@ -1,26 +1,86 @@
 @import "tailwindcss";
 
+/*
+ * Identidad visual de la ticketera: tema oscuro fijo (no cambia con el
+ * sistema operativo, como Spotify) con un acento violeta eléctrico.
+ * Se eligió oscuro a propósito: además de la estética "discoteca premium",
+ * es más legible en la pantalla de escaneo de la puerta, que se usa de
+ * noche con poca luz.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0a10;
+  --background-alt: #0f0f18;
+  --surface: #16161f;
+  --surface-hover: #1e1e2a;
+  --border: #27273a;
+  --border-hover: #35354d;
+
+  --foreground: #f5f5f8;
+  --muted: #9a9ab0;
+  --muted-2: #6c6c85;
+
+  --accent: #8b5cf6;
+  --accent-hover: #7c3aed;
+  --accent-foreground: #ffffff;
+  --accent-2: #ec4899;
+
+  --success: #34d399;
+  --success-bg: #0d2a20;
+  --danger: #fb7185;
+  --danger-bg: #2c1018;
+  --warning: #fbbf24;
+  --warning-bg: #2c2008;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-alt: var(--background-alt);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-border: var(--border);
+  --color-border-hover: var(--border-hover);
+
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-2: var(--muted-2);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-2: var(--accent-2);
+
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: dark;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Brillo sutil de fondo, tipo luz de escenario. Una sola vez, en el html,
+   para que no se repita al navegar entre páginas dentro del layout. */
+.ambient-glow {
+  background:
+    radial-gradient(60rem 30rem at 15% -10%, color-mix(in oklab, var(--accent) 20%, transparent), transparent),
+    radial-gradient(50rem 25rem at 110% 10%, color-mix(in oklab, var(--accent-2) 14%, transparent), transparent);
+}
+
+/* Autofill de Chrome ignora el color de fondo del input; esto lo corrige
+   para que no aparezca un input blanco roto en medio del formulario oscuro. */
+input:-webkit-autofill {
+  -webkit-text-fill-color: var(--foreground);
+  transition: background-color 9999s ease-in-out 0s;
 }

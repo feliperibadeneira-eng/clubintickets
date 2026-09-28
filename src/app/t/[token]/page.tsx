@@ -1,35 +1,19 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { CalendarDays, MapPin } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { formatEventDate } from "@/lib/pricing";
 import { ticketQrDataUrl } from "@/lib/qr";
+import { Badge } from "@/components/ui/Badge";
 
 export const dynamic = "force-dynamic";
 
-const statusLabel: Record<string, { text: string; className: string }> = {
-  VALID: {
-    text: "Válida — lista para usar",
-    className:
-      "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
-  },
-  USED: {
-    text: "Ya fue usada en la puerta",
-    className:
-      "bg-neutral-200 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300",
-  },
-  PENDING: {
-    text: "Pago pendiente — todavía no es válida",
-    className:
-      "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
-  },
-  VOID: {
-    text: "Anulada",
-    className: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
-  },
-  REFUNDED: {
-    text: "Reembolsada",
-    className: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
-  },
+const statusLabel: Record<string, { text: string; tone: "success" | "neutral" | "warning" | "danger" }> = {
+  VALID: { text: "Válida — lista para usar", tone: "success" },
+  USED: { text: "Ya fue usada en la puerta", tone: "neutral" },
+  PENDING: { text: "Pago pendiente — todavía no es válida", tone: "warning" },
+  VOID: { text: "Anulada", tone: "danger" },
+  REFUNDED: { text: "Reembolsada", tone: "danger" },
 };
 
 // Página pública de una entrada individual: la que se linkea desde el email
@@ -53,44 +37,61 @@ export default async function TicketPage({
   const label = statusLabel[ticket.status];
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center px-4 py-10 text-center">
-      <p className="text-sm text-neutral-500">{ticket.event.name}</p>
-      <p className="mt-1 text-sm text-neutral-500">
-        {formatEventDate(ticket.event.startsAt)}
-      </p>
-      <p className="text-sm text-neutral-500">
-        {ticket.event.venue.name} · {ticket.event.venue.city}
-      </p>
-
-      <span
-        className={`mt-4 rounded-full px-3 py-1 text-sm font-medium ${label.className}`}
-      >
-        {label.text}
-      </span>
-
-      {qrDataUrl ? (
-        <Image
-          src={qrDataUrl}
-          alt="Código QR de la entrada"
-          width={280}
-          height={280}
-          unoptimized
-          className="mt-6 rounded-xl border border-neutral-200 dark:border-neutral-800"
-        />
-      ) : (
-        <div className="mt-6 flex h-[280px] w-[280px] items-center justify-center rounded-xl border border-dashed border-neutral-300 text-sm text-neutral-500 dark:border-neutral-700">
-          Sin código QR
+    <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 py-10">
+      <div className="overflow-hidden rounded-3xl border border-border bg-surface">
+        <div className="bg-gradient-to-br from-accent/25 via-surface to-surface p-6 text-center">
+          <p className="text-sm font-medium text-accent">
+            {ticket.ticketType.name}
+          </p>
+          <h1 className="mt-1 text-xl font-bold tracking-tight">
+            {ticket.event.name}
+          </h1>
+          <div className="mt-3 flex flex-col items-center gap-1 text-sm text-muted">
+            <span className="inline-flex items-center gap-1.5">
+              <CalendarDays size={14} className="text-muted-2" />
+              {formatEventDate(ticket.event.startsAt)}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin size={14} className="text-muted-2" />
+              {ticket.event.venue.name} · {ticket.event.venue.city}
+            </span>
+          </div>
+          <div className="mt-4 flex justify-center">
+            <Badge tone={label.tone}>{label.text}</Badge>
+          </div>
         </div>
-      )}
 
-      <div className="mt-6 w-full rounded-xl border border-neutral-200 p-4 text-left dark:border-neutral-800">
-        <p className="text-lg font-semibold">{ticket.attendeeName}</p>
-        <p className="text-sm text-neutral-500">
-          {ticket.ticketType.name} · {ticket.attendeeIdNumber}
-        </p>
+        {/* Línea "perforada" tipo talón de entrada real. */}
+        <div className="relative border-t border-dashed border-border">
+          <div className="absolute -top-3 -left-3 h-6 w-6 rounded-full bg-background" />
+          <div className="absolute -top-3 -right-3 h-6 w-6 rounded-full bg-background" />
+        </div>
+
+        <div className="flex flex-col items-center p-6">
+          {qrDataUrl ? (
+            <div className="rounded-2xl bg-white p-3">
+              <Image
+                src={qrDataUrl}
+                alt="Código QR de la entrada"
+                width={240}
+                height={240}
+                unoptimized
+              />
+            </div>
+          ) : (
+            <div className="flex h-[240px] w-[240px] items-center justify-center rounded-2xl border border-dashed border-border text-sm text-muted">
+              Sin código QR
+            </div>
+          )}
+
+          <div className="mt-6 w-full text-center">
+            <p className="text-lg font-semibold">{ticket.attendeeName}</p>
+            <p className="text-sm text-muted">{ticket.attendeeIdNumber}</p>
+          </div>
+        </div>
       </div>
 
-      <p className="mt-4 text-xs text-neutral-500">
+      <p className="mt-5 text-center text-xs text-muted">
         Esta entrada es intransferible. Presentá este código QR en la puerta
         junto con tu documento de identidad.
       </p>
