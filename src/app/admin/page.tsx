@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarDays, Pencil, Plus } from "lucide-react";
+import { CalendarDays, Pencil, Plus, Users } from "lucide-react";
 import { requireOrganizer } from "@/lib/auth";
 import { listOrganizerEvents } from "@/lib/dashboard";
 import { formatEventDate, formatUSD } from "@/lib/pricing";
@@ -34,11 +34,17 @@ export default async function AdminHomePage() {
             Hola, {user.name}
           </h1>
         </div>
-        <form action={logout} className="shrink-0">
-          <Button type="submit" variant="secondary" size="sm">
-            Cerrar sesión
-          </Button>
-        </form>
+        <div className="flex shrink-0 gap-2">
+          <Link href="/admin/staff" className={buttonClasses("secondary", "sm")}>
+            <Users size={14} />
+            Staff
+          </Link>
+          <form action={logout}>
+            <Button type="submit" variant="secondary" size="sm">
+              Cerrar sesión
+            </Button>
+          </form>
+        </div>
       </div>
 
       <div className="mt-8">
