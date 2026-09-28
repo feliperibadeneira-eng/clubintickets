@@ -101,6 +101,9 @@ model Order {
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 
+  // Cuándo se mandó el email con las entradas (null = todavía no).
+  emailSentAt DateTime?
+
   event   Event       @relation(fields: [eventId], references: [id])
   items   OrderItem[]
   tickets Ticket[]
@@ -130,7 +133,7 @@ enum TicketStatus {
   VOID // anulada (por ejemplo, la orden expiró)
 }
 
-// Cada entrada individual, nominativa. El QR llega en la Fase 3.
+// Cada entrada individual, nominativa.
 model Ticket {
   id               String       @id @default(cuid())
   orderId          String
@@ -139,6 +142,10 @@ model Ticket {
   attendeeName     String
   attendeeIdNumber String
   status           TicketStatus @default(PENDING)
+  // Token al azar (no correlativo) que identifica la entrada en su QR y en
+  // el link "ver mi entrada". Separado del id interno para poder rotarlo
+  // si hiciera falta sin afectar las relaciones de la base de datos.
+  qrToken          String       @unique @default(uuid())
   createdAt        DateTime     @default(now())
 
   order      Order      @relation(fields: [orderId], references: [id])

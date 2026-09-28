@@ -101,10 +101,18 @@ export default async function OrderPage({
       ) : order.status === "PAID" ? (
         <>
           <h1 className="text-3xl font-bold">¡Gracias por tu compra!</h1>
-          <p className="mt-3 text-neutral-600 dark:text-neutral-400">
-            Tu pago está confirmado. Pronto vas a recibir tus entradas en{" "}
-            <strong>{order.buyerEmail}</strong>.
-          </p>
+          {order.emailSentAt ? (
+            <p className="mt-3 text-neutral-600 dark:text-neutral-400">
+              Tu pago está confirmado y te mandamos tus entradas a{" "}
+              <strong>{order.buyerEmail}</strong>.
+            </p>
+          ) : (
+            <p className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+              Tu pago está confirmado, pero no pudimos enviarte el email con
+              las entradas. No hay problema: podés verlas y guardarlas desde
+              acá abajo.
+            </p>
+          )}
 
           <ul className="mt-6 space-y-2">
             {order.items.map((item) => (
@@ -129,20 +137,27 @@ export default async function OrderPage({
             <h2 className="text-sm font-semibold text-neutral-500">
               Tus entradas
             </h2>
-            <ul className="mt-2 space-y-1 text-sm">
+            <ul className="mt-2 space-y-2 text-sm">
               {order.tickets.map((t) => (
-                <li key={t.id} className="flex justify-between">
-                  <span>{t.attendeeName}</span>
-                  <span className="text-neutral-500">
-                    {t.ticketType.name} · {t.attendeeIdNumber}
+                <li
+                  key={t.id}
+                  className="flex items-center justify-between gap-3"
+                >
+                  <span>
+                    {t.attendeeName}
+                    <span className="ml-2 text-neutral-500">
+                      {t.ticketType.name} · {t.attendeeIdNumber}
+                    </span>
                   </span>
+                  <Link
+                    href={`/t/${t.qrToken}`}
+                    className="shrink-0 rounded-full border border-neutral-300 px-3 py-1 text-xs font-medium transition hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                  >
+                    Ver entrada
+                  </Link>
                 </li>
               ))}
             </ul>
-            <p className="mt-3 text-xs text-neutral-500">
-              El código QR de cada entrada y el envío por email llegan en la
-              próxima fase.
-            </p>
           </section>
         </>
       ) : (

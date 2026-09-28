@@ -110,7 +110,7 @@ export async function createOrder(input: {
     for (const a of sel.attendees) {
       if (a.fullName.trim().length < 3)
         return { ok: false, error: "Hay nombres de asistente incompletos." };
-      if (!/^[0-9A-Za-z-]{5,20}$/.test(a.idNumber.trim()))
+      if (!/^[-0-9A-Za-z]{5,20}$/.test(a.idNumber.trim()))
         return {
           ok: false,
           error: "Hay cédulas/pasaportes inválidos (5 a 20 letras o números).",
@@ -225,7 +225,7 @@ class StockError extends Error {}
 // orden como PAID y las entradas como VALID) es el mismo que se necesita ahí.
 // --------------------------------------------------------------------------
 export type ConfirmPaymentResult =
-  | { ok: true }
+  | { ok: true; emailError?: string }
   | { ok: false; error: string };
 
 export async function confirmTestPayment(
@@ -248,5 +248,10 @@ export async function confirmTestPayment(
       data: { status: "VALID" },
     }),
   ]);
-  return { ok: true };
+
+  // El email es "mejor esfuerzo": si falla, el pago ya quedó confirmado
+  // igual — el comprador siempre puede ver sus entradas desde /orden/[id].
+  const { sendTicketsEmail } = await import("@/lib/email");
+  const emailResult = await sendTicketsEmail(orderId);
+  return emailResult.ok ? { ok: true } : { ok: true, emailError: emailResult.error };
 }
