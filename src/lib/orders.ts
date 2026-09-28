@@ -211,3 +211,42 @@ export async function createOrder(input: {
 }
 
 class StockError extends Error {}
+
+// --------------------------------------------------------------------------
+// PAGO DE PRUEBA (temporal)
+//
+// Todavía no tenemos pasarela de pago real conectada (falta el RUC para dar
+// de alta la cuenta de PayPhone — ver SPEC.md sección 5). Mientras tanto,
+// esta función simula la confirmación de pago para poder seguir probando el
+// resto del sistema (QR, email, panel del organizador).
+//
+// Cuando integremos PayPhone, esta función se reemplaza por el webhook real
+// que PayPhone llama al confirmar un cobro; el resto del código (marcar la
+// orden como PAID y las entradas como VALID) es el mismo que se necesita ahí.
+// --------------------------------------------------------------------------
+export type ConfirmPaymentResult =
+  | { ok: true }
+  | { ok: false; error: string };
+
+export async function confirmTestPayment(
+  orderId: string,
+): Promise<ConfirmPaymentResult> {
+  const order = await prisma.order.findUnique({ where: { id: orderId } });
+  if (!order) return { ok: false, error: "La orden no existe." };
+  if (order.status !== "PENDING")
+    return { ok: false, error: "Esta orden ya no está pendiente de pago." };
+  if (order.expiresAt <= new Date())
+    return { ok: false, error: "La reserva ya expiró." };
+
+  await prisma.$transaction([
+    prisma.order.update({
+      where: { id: orderId },
+      data: { status: "PAID" },
+    }),
+    prisma.ticket.updateMany({
+      where: { orderId, status: "PENDING" },
+      data: { status: "VALID" },
+    }),
+  ]);
+  return { ok: true };
+}

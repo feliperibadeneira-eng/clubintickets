@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { formatUSD } from "@/lib/pricing";
 import { Countdown } from "./Countdown";
+import { TestPaymentButton } from "./TestPaymentButton";
 
 export const dynamic = "force-dynamic";
 
@@ -95,9 +96,7 @@ export default async function OrderPage({
             </ul>
           </section>
 
-          <div className="mt-8 rounded-xl border border-dashed border-neutral-300 p-6 text-center text-neutral-500 dark:border-neutral-700">
-            Próximo paso en construcción: pago con PayPhone (sandbox).
-          </div>
+          <TestPaymentButton orderId={order.id} />
         </>
       ) : order.status === "PAID" ? (
         <>
@@ -106,6 +105,45 @@ export default async function OrderPage({
             Tu pago está confirmado. Pronto vas a recibir tus entradas en{" "}
             <strong>{order.buyerEmail}</strong>.
           </p>
+
+          <ul className="mt-6 space-y-2">
+            {order.items.map((item) => (
+              <li
+                key={item.id}
+                className="flex justify-between rounded-lg border border-neutral-200 p-4 dark:border-neutral-800"
+              >
+                <span>
+                  {item.quantity} × {item.ticketType.name}
+                </span>
+                <span className="font-medium">
+                  {formatUSD(item.unitPriceCents * item.quantity)}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-right text-xl font-bold">
+            Total: {formatUSD(order.totalCents)}
+          </p>
+
+          <section className="mt-4 rounded-xl border border-neutral-200 p-4 dark:border-neutral-800">
+            <h2 className="text-sm font-semibold text-neutral-500">
+              Tus entradas
+            </h2>
+            <ul className="mt-2 space-y-1 text-sm">
+              {order.tickets.map((t) => (
+                <li key={t.id} className="flex justify-between">
+                  <span>{t.attendeeName}</span>
+                  <span className="text-neutral-500">
+                    {t.ticketType.name} · {t.attendeeIdNumber}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-3 text-xs text-neutral-500">
+              El código QR de cada entrada y el envío por email llegan en la
+              próxima fase.
+            </p>
+          </section>
         </>
       ) : (
         <>

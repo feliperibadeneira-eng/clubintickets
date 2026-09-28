@@ -12,6 +12,10 @@ const prisma = new PrismaClient({
 const ec = (s: string) => new Date(`${s}-05:00`);
 
 async function main() {
+  // Orden de borrado: primero lo que depende de otras tablas (FKs).
+  await prisma.ticket.deleteMany();
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
   await prisma.priceTier.deleteMany();
   await prisma.ticketType.deleteMany();
   await prisma.event.deleteMany();
