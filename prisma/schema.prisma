@@ -20,6 +20,7 @@ model Organization {
 
   venues Venue[]
   events Event[]
+  users  User[]
 }
 
 // Un lugar físico (discoteca, salón). Una organización puede tener varios.
@@ -32,6 +33,38 @@ model Venue {
 
   organization Organization @relation(fields: [organizationId], references: [id])
   events       Event[]
+}
+
+enum UserRole {
+  ORGANIZER // administra todo (hoy: solo Felipe)
+  STAFF // solo puede entrar a escanear entradas en la puerta
+}
+
+// Una cuenta con usuario y contraseña: organizador o staff de puerta.
+model User {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  email          String   @unique
+  passwordHash   String
+  role           UserRole
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  organization  Organization @relation(fields: [organizationId], references: [id])
+  sessions      Session[]
+  checkIns      CheckIn[]
+  ticketsScanned Ticket[]    @relation("TicketUsedBy")
+}
+
+// Una sesión iniciada: la cookie del navegador solo guarda este id al azar.
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 enum EventStatus {
@@ -59,6 +92,7 @@ model Event {
   ticketTypes  TicketType[]
   orders       Order[]
   tickets      Ticket[]
+  checkIns     CheckIn[]
 }
 
 // General, VIP, Combo 4 Amigos, etc. El precio vive en PriceTier (tandas).
@@ -148,11 +182,42 @@ model Ticket {
   qrToken          String       @unique @default(uuid())
   createdAt        DateTime     @default(now())
 
+  // Quién y cuándo hizo el primer escaneo válido (para el mensaje de
+  // "ya fue usada" si alguien intenta escanearla de nuevo).
+  usedAt       DateTime?
+  usedByUserId String?
+
   order      Order      @relation(fields: [orderId], references: [id])
   event      Event      @relation(fields: [eventId], references: [id])
   ticketType TicketType @relation(fields: [ticketTypeId], references: [id])
+  usedByUser User?      @relation("TicketUsedBy", fields: [usedByUserId], references: [id])
+  checkIns   CheckIn[]
 
   @@index([eventId, status])
+}
+
+enum CheckInResult {
+  GRANTED // entrada válida, se dejó pasar
+  ALREADY_USED // la entrada ya se había escaneado antes
+  INVALID // QR que no corresponde a ninguna entrada, o de otro evento
+}
+
+// Registro de cada intento de escaneo en la puerta (aceptado o rechazado).
+// Sirve para el control de acceso en vivo del organizador y para detectar
+// entradas duplicadas o compartidas (SPEC.md sección 7).
+model CheckIn {
+  id       String        @id @default(cuid())
+  eventId  String
+  ticketId String? // null si el QR no correspondía a ninguna entrada
+  userId   String // qué cuenta de staff escaneó
+  result   CheckInResult
+  scannedAt DateTime     @default(now())
+
+  event  Event   @relation(fields: [eventId], references: [id])
+  ticket Ticket? @relation(fields: [ticketId], references: [id])
+  user   User    @relation(fields: [userId], references: [id])
+
+  @@index([eventId, scannedAt])
 }
 
 // Tanda de precio con vigencia por fechas (early bird, tanda 2, ...).

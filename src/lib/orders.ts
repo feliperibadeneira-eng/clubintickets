@@ -110,7 +110,7 @@ export async function createOrder(input: {
     for (const a of sel.attendees) {
       if (a.fullName.trim().length < 3)
         return { ok: false, error: "Hay nombres de asistente incompletos." };
-      if (!/^[-0-9A-Za-z]{5,20}$/.test(a.idNumber.trim()))
+      if (!/^[0-9A-Za-z\-]{5,20}$/.test(a.idNumber.trim()))
         return {
           ok: false,
           error: "Hay cédulas/pasaportes inválidos (5 a 20 letras o números).",

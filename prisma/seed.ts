@@ -3,6 +3,7 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
+import { hashPassword } from "../src/lib/password";
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
@@ -13,9 +14,12 @@ const ec = (s: string) => new Date(`${s}-05:00`);
 
 async function main() {
   // Orden de borrado: primero lo que depende de otras tablas (FKs).
+  await prisma.checkIn.deleteMany();
   await prisma.ticket.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
+  await prisma.session.deleteMany();
+  await prisma.user.deleteMany();
   await prisma.priceTier.deleteMany();
   await prisma.ticketType.deleteMany();
   await prisma.event.deleteMany();
@@ -92,7 +96,38 @@ async function main() {
     },
   });
 
+  // Cuentas de prueba para el login de staff (Fase 3, escaneo en la
+  // puerta). Contraseñas de desarrollo, nunca usar estas en producción.
+  const STAFF_PASSWORD = "Portero123!";
+  const ORGANIZER_PASSWORD = "Organizador123!";
+  await prisma.user.create({
+    data: {
+      organizationId: org.id,
+      name: "Felipe (organizador)",
+      email: "felipe@demo-producciones.test",
+      passwordHash: await hashPassword(ORGANIZER_PASSWORD),
+      role: "ORGANIZER",
+    },
+  });
+  await prisma.user.create({
+    data: {
+      organizationId: org.id,
+      name: "Portero Demo",
+      email: "portero@demo-producciones.test",
+      passwordHash: await hashPassword(STAFF_PASSWORD),
+      role: "STAFF",
+    },
+  });
+
   console.log("Seed OK: evento 'Noche de Verano' con 3 tipos de entrada.");
+  console.log("");
+  console.log("Cuentas de prueba para /staff/login:");
+  console.log(
+    `  Organizador -> felipe@demo-producciones.test / ${ORGANIZER_PASSWORD}`,
+  );
+  console.log(
+    `  Staff       -> portero@demo-producciones.test / ${STAFF_PASSWORD}`,
+  );
 }
 
 main()

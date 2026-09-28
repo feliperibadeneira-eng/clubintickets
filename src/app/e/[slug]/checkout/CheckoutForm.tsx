@@ -90,7 +90,7 @@ export function CheckoutForm({
                 <input
                   name={`attendee-${item.ticketTypeId}-${i}-id`}
                   required
-                  pattern="[-0-9A-Za-z]{5,20}"
+                  pattern="[0-9A-Za-z\-]{5,20}"
                   title="Cédula o pasaporte: 5 a 20 letras o números"
                   placeholder="Cédula o pasaporte"
                   className="rounded-lg border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-700"
