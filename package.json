@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma migrate deploy && next build",
     "start": "next start",
     "lint": "eslint",
+    "postinstall": "prisma generate",
     "db:start": "prisma dev --name ticketera --detach",
     "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {

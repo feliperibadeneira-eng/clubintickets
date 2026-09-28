@@ -231,6 +231,16 @@ export type ConfirmPaymentResult =
 export async function confirmTestPayment(
   orderId: string,
 ): Promise<ConfirmPaymentResult> {
+  // Defensa en profundidad: aunque alguien llame a esta función
+  // directamente (sin pasar por el botón de la UI, que ya está oculto en
+  // producción), en producción esto nunca debe poder "pagar" gratis.
+  if (process.env.NODE_ENV === "production") {
+    return {
+      ok: false,
+      error: "El pago de prueba está desactivado en producción.",
+    };
+  }
+
   const order = await prisma.order.findUnique({ where: { id: orderId } });
   if (!order) return { ok: false, error: "La orden no existe." };
   if (order.status !== "PENDING")

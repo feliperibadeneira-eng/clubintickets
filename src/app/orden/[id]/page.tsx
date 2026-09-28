@@ -108,7 +108,15 @@ export default async function OrderPage({
             </ul>
           </Card>
 
-          <TestPaymentButton orderId={order.id} />
+          {process.env.NODE_ENV === "production" ? (
+            <div className="mt-8 rounded-2xl border border-dashed border-border bg-surface p-6 text-center text-muted">
+              El cobro con PayPhone todavía se está configurando. Mientras
+              tanto, esta orden queda reservada — escribinos si necesitás
+              completar el pago.
+            </div>
+          ) : (
+            <TestPaymentButton orderId={order.id} />
+          )}
         </>
       ) : order.status === "PAID" ? (
         <>
