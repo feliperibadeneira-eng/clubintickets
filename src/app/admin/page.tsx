@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, Pencil, Plus } from "lucide-react";
 import { requireOrganizer } from "@/lib/auth";
 import { listOrganizerEvents } from "@/lib/dashboard";
 import { formatEventDate, formatUSD } from "@/lib/pricing";
 import { logout } from "@/lib/session-actions";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { Button, buttonClasses } from "@/components/ui/Button";
 
 export const dynamic = "force-dynamic";
 
@@ -41,12 +41,19 @@ export default async function AdminHomePage() {
         </form>
       </div>
 
-      <ul className="mt-8 space-y-3">
+      <div className="mt-8">
+        <Link href="/admin/eventos/nuevo" className={buttonClasses("primary", "md")}>
+          <Plus size={16} />
+          Nuevo evento
+        </Link>
+      </div>
+
+      <ul className="mt-5 space-y-3">
         {events.map((e) => (
           <li key={e.id}>
-            <Link href={`/admin/eventos/${e.id}`}>
-              <Card interactive>
-                <div className="flex items-start justify-between gap-3">
+            <Card interactive className="relative">
+              <Link href={`/admin/eventos/${e.id}`} className="block">
+                <div className="flex items-start justify-between gap-3 pr-9">
                   <div>
                     <h2 className="text-lg font-semibold">{e.name}</h2>
                     <p className="mt-0.5 inline-flex items-center gap-1.5 text-sm text-muted">
@@ -72,8 +79,15 @@ export default async function AdminHomePage() {
                     <span className="text-muted">recaudado</span>
                   </span>
                 </div>
-              </Card>
-            </Link>
+              </Link>
+              <Link
+                href={`/admin/eventos/${e.id}/editar`}
+                aria-label={`Editar ${e.name}`}
+                className="absolute top-5 right-5 rounded-full p-1.5 text-muted transition hover:bg-surface-hover hover:text-foreground"
+              >
+                <Pencil size={16} />
+              </Link>
+            </Card>
           </li>
         ))}
         {events.length === 0 && (

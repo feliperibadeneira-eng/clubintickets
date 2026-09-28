@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { DollarSign, Ticket, UserCheck, Download } from "lucide-react";
+import { DollarSign, Ticket, UserCheck, Download, Pencil } from "lucide-react";
 import { requireOrganizer } from "@/lib/auth";
 import { getEventDashboard } from "@/lib/dashboard";
 import { formatEventDate, formatUSD } from "@/lib/pricing";
@@ -44,7 +44,16 @@ export default async function EventDashboardPage({
       >
         ← Todos los eventos
       </Link>
-      <h1 className="mt-2 text-2xl font-bold tracking-tight">{event.name}</h1>
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold tracking-tight">{event.name}</h1>
+        <Link
+          href={`/admin/eventos/${event.id}/editar`}
+          className={buttonClasses("secondary", "sm")}
+        >
+          <Pencil size={14} />
+          Editar evento
+        </Link>
+      </div>
       <p className="text-sm text-muted">
         {formatEventDate(event.startsAt)} · {event.venueName}
       </p>
