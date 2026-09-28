@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { Html5Qrcode as Html5QrcodeType } from "html5-qrcode";
-import { scanTicket, logout } from "./actions";
+import { scanTicket } from "./actions";
+import { logout } from "@/lib/session-actions";
 import type { EventOption, CheckInResult } from "@/lib/checkin";
 
 const READER_ID = "qr-reader";

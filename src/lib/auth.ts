@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { randomUUID } from "crypto";
 import { prisma } from "@/lib/db";
 
@@ -70,4 +71,15 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     role: user.role,
     organizationId: user.organizationId,
   };
+}
+
+// Para usar al principio de cualquier página/acción del panel del
+// organizador. Un miembro del staff logueado que intenta entrar por URL
+// también se manda de vuelta al login, no solo un visitante anónimo.
+export async function requireOrganizer(): Promise<CurrentUser> {
+  const user = await getCurrentUser();
+  if (!user || user.role !== "ORGANIZER") {
+    redirect("/login");
+  }
+  return user;
 }

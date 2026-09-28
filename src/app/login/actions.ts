@@ -25,5 +25,5 @@ export async function login(
   if (!valid) return { error: "Usuario o contraseña incorrectos." };
 
   await createSession(user.id);
-  redirect("/staff/scan");
+  redirect(user.role === "ORGANIZER" ? "/admin" : "/staff/scan");
 }

@@ -121,7 +121,7 @@ async function main() {
 
   console.log("Seed OK: evento 'Noche de Verano' con 3 tipos de entrada.");
   console.log("");
-  console.log("Cuentas de prueba para /staff/login:");
+  console.log("Cuentas de prueba para /login:");
   console.log(
     `  Organizador -> felipe@demo-producciones.test / ${ORGANIZER_PASSWORD}`,
   );

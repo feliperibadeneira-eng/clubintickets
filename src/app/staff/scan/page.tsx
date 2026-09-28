@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export default async function ScanPage() {
   const user = await getCurrentUser();
-  if (!user) redirect("/staff/login");
+  if (!user) redirect("/login");
 
   const events = await eventsForOrganization(user.organizationId);
 
