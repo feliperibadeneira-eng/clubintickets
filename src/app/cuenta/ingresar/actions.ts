@@ -31,11 +31,12 @@ export async function requestBuyerLogin(
     },
   });
   const base = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
-  await sendBuyerLoginEmail(
+  const result = await sendBuyerLoginEmail(
     buyer.email,
     buyer.name,
     `${base}/cuenta/verificar/${token.id}`,
   );
+  if (!result.ok) return { sent: false, error: result.error };
 
   return { sent: true };
 }
