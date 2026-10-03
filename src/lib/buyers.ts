@@ -19,13 +19,14 @@ export async function upsertBuyerFromOrder(
 }
 
 // Para la pantalla de "pedir link de ingreso": si ya existe un Buyer lo
-// devuelve, y si no existe pero esa persona ya compró algo antes (de cuando
-// todavía no existía esta función), lo crea a partir de su compra más
-// reciente. Si el email nunca compró nada, devuelve null — no creamos
-// cuentas de la nada ni le damos pistas a quien intenta adivinar emails.
-export async function findOrBackfillBuyer(
+// devuelve. Si no existe, lo crea — ya sea a partir de una compra anterior
+// (de cuando todavía no existía esta función) o, si nunca compró nada,
+// como cuenta nueva: no hace falta haber comprado una entrada para
+// registrarse, solo confirmar que el email es tuyo abriendo el link.
+export async function findOrCreateBuyer(
   email: string,
-): Promise<{ id: string; name: string; email: string } | null> {
+  fallbackName?: string,
+): Promise<{ id: string; name: string; email: string }> {
   const normalizedEmail = email.trim().toLowerCase();
 
   const existing = await prisma.buyer.findUnique({
@@ -37,11 +38,21 @@ export async function findOrBackfillBuyer(
     where: { buyerEmail: normalizedEmail },
     orderBy: { createdAt: "desc" },
   });
-  if (!latestOrder) return null;
 
-  return prisma.buyer.create({
-    data: { email: normalizedEmail, name: latestOrder.buyerName },
-  });
+  const name = latestOrder?.buyerName || fallbackName?.trim() || nameFromEmail(normalizedEmail);
+  return prisma.buyer.create({ data: { email: normalizedEmail, name } });
+}
+
+// Nombre provisorio para una cuenta nueva sin nombre: "ana.perez@x.com" ->
+// "Ana Perez". Se puede corregir después desde "Mi cuenta".
+function nameFromEmail(email: string): string {
+  const local = email.split("@")[0] ?? email;
+  return local
+    .replace(/[._-]+/g, " ")
+    .split(" ")
+    .filter(Boolean)
+    .map((w) => w[0].toUpperCase() + w.slice(1))
+    .join(" ");
 }
 
 export type BuyerOrderSummary = {

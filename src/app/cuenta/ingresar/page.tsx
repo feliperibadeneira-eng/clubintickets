@@ -18,8 +18,9 @@ export default async function BuyerLoginPage() {
         </div>
         <h1 className="mt-4 text-2xl font-bold tracking-tight">Mi cuenta</h1>
         <p className="mt-1 text-sm text-muted">
-          Escribí el email con el que compraste y te mandamos un link para
-          entrar — no hace falta contraseña.
+          Escribí tu email y te mandamos un link para entrar — no hace
+          falta contraseña. Si es la primera vez, te creamos la cuenta al
+          toque.
         </p>
         <LoginRequestForm />
       </Card>

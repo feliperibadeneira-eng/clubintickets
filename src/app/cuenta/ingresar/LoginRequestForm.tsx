@@ -20,8 +20,7 @@ export function LoginRequestForm() {
           Revisá tu correo
         </p>
         <p className="mt-1 text-success/80">
-          Si ese email tiene compras con nosotros, te mandamos un link para
-          entrar. Vale por 30 minutos.
+          Te mandamos un link para entrar. Vale por 30 minutos.
         </p>
       </div>
     );
@@ -38,6 +37,15 @@ export function LoginRequestForm() {
           required
           autoComplete="email"
           placeholder="tu@email.com"
+        />
+      </div>
+      <div>
+        <Label htmlFor="name">Nombre (si es tu primera vez)</Label>
+        <Input
+          id="name"
+          name="name"
+          autoComplete="name"
+          placeholder="Tu nombre completo"
         />
       </div>
 
