@@ -96,6 +96,49 @@ export async function sendTicketsEmail(
   return { ok: true };
 }
 
+export type SendLoginLinkResult = { ok: true } | { ok: false; error: string };
+
+// Manda el link mágico de "Mi cuenta" (ver src/lib/buyerAuth.ts). A
+// diferencia del email de entradas, acá no hay nada que mostrar si falla:
+// el comprador simplemente no recibe el link y puede pedirlo de nuevo.
+export async function sendBuyerLoginEmail(
+  to: string,
+  name: string,
+  loginUrl: string,
+): Promise<SendLoginLinkResult> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return { ok: false, error: "Falta configurar RESEND_API_KEY." };
+
+  const resend = new Resend(apiKey);
+  const html = `
+    <div style="font-family:sans-serif;max-width:480px;margin:0 auto;">
+      <h1 style="font-size:20px;">Entrá a tu cuenta</h1>
+      <p>Hola ${escapeHtml(name)}, usá este link para ver tus compras y entradas:</p>
+      <p style="margin:24px 0;">
+        <a href="${loginUrl}" style="display:inline-block;background:#111;color:#fff;padding:12px 20px;border-radius:999px;text-decoration:none;">
+          Entrar a mi cuenta
+        </a>
+      </p>
+      <p style="color:#666;font-size:13px;">
+        Este link vale por 30 minutos y es de un solo uso. Si no lo pediste
+        vos, podés ignorar este email.
+      </p>
+    </div>`;
+
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM,
+      to,
+      subject: "Tu link para entrar a Ticketera",
+      html,
+    });
+    if (error) return { ok: false, error: error.message };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : String(e) };
+  }
+  return { ok: true };
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")

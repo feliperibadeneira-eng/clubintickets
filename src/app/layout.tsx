@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { UserRound } from "lucide-react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Brand } from "@/components/Brand";
 import "./globals.css";
@@ -29,8 +31,15 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="ambient-glow flex min-h-full flex-col">
-        <header className="border-b border-border/60 px-4 py-3.5">
+        <header className="flex items-center justify-between border-b border-border/60 px-4 py-3.5">
           <Brand />
+          <Link
+            href="/cuenta"
+            className="inline-flex items-center gap-1.5 text-sm text-muted transition hover:text-foreground"
+          >
+            <UserRound size={16} />
+            Mi cuenta
+          </Link>
         </header>
         {children}
       </body>
