@@ -259,11 +259,6 @@ export async function confirmTestPayment(
     }),
   ]);
 
-  // Deja lista la identidad del comprador para que después pueda pedir un
-  // link de ingreso a "Mi cuenta" y ver esta compra (y las que vengan).
-  const { upsertBuyerFromOrder } = await import("@/lib/buyers");
-  await upsertBuyerFromOrder(order.buyerEmail, order.buyerName);
-
   // El email es "mejor esfuerzo": si falla, el pago ya quedó confirmado
   // igual — el comprador siempre puede ver sus entradas desde /orden/[id].
   const { sendTicketsEmail } = await import("@/lib/email");

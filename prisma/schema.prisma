@@ -67,33 +67,20 @@ model Session {
   user User @relation(fields: [userId], references: [id])
 }
 
-// Identidad de un comprador, identificado por su email (no tiene
-// contraseña: entra por link mágico, ver BuyerLoginToken). Se crea sola la
-// primera vez que esa persona paga una orden, o la primera vez que pide un
-// link de ingreso para un email con compras previas.
+// Cuenta de un comprador: nombre, email y contraseña, igual que User pero
+// separada por completo (un comprador nunca tiene rol de organizador/staff
+// ni viceversa). Se crea por registro explícito, no automáticamente al
+// comprar — eso evita depender de que le llegue un email para poder
+// entrar (ver src/app/cuenta/registro).
 model Buyer {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  loginTokens BuyerLoginToken[]
-  sessions    BuyerSession[]
-}
-
-// Link mágico de un solo uso que mandamos por email para que un comprador
-// entre a "Mi cuenta" sin contraseña.
-model BuyerLoginToken {
-  id        String    @id @default(uuid())
-  buyerId   String
-  expiresAt DateTime
-  usedAt    DateTime?
-  createdAt DateTime  @default(now())
-
-  buyer Buyer @relation(fields: [buyerId], references: [id])
-
-  @@index([buyerId])
+  sessions BuyerSession[]
 }
 
 // Sesión de un comprador ya verificado: la cookie del navegador solo

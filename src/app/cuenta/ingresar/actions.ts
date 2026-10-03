@@ -1,42 +1,30 @@
 "use server";
 
-import { randomUUID } from "crypto";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { findOrCreateBuyer } from "@/lib/buyers";
-import { sendBuyerLoginEmail } from "@/lib/email";
+import { verifyPassword } from "@/lib/password";
+import { createBuyerSession } from "@/lib/buyerAuth";
 
-const TOKEN_MINUTES = 30;
+export type LoginState = { error: string } | null;
 
-export type RequestLoginState = { sent: true } | { sent: false; error: string } | null;
-
-// No hace falta haber comprado antes: si el email no tiene cuenta, se crea
-// una nueva acá mismo (ver findOrCreateBuyer). Entrar siempre es "pedí el
-// link y confirmalo desde tu correo", sea cuenta nueva o existente.
-export async function requestBuyerLogin(
-  _prev: RequestLoginState,
+export async function loginBuyer(
+  _prev: LoginState,
   formData: FormData,
-): Promise<RequestLoginState> {
+): Promise<LoginState> {
   const email = String(formData.get("email") ?? "")
     .trim()
     .toLowerCase();
-  const name = String(formData.get("name") ?? "");
-  if (!email) return { sent: false, error: "Escribí tu email." };
+  const password = String(formData.get("password") ?? "");
+  if (!email || !password) return { error: "Completá email y contraseña." };
 
-  const buyer = await findOrCreateBuyer(email, name);
-  const token = await prisma.buyerLoginToken.create({
-    data: {
-      id: randomUUID(),
-      buyerId: buyer.id,
-      expiresAt: new Date(Date.now() + TOKEN_MINUTES * 60_000),
-    },
-  });
-  const base = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
-  const result = await sendBuyerLoginEmail(
-    buyer.email,
-    buyer.name,
-    `${base}/cuenta/verificar/${token.id}`,
-  );
-  if (!result.ok) return { sent: false, error: result.error };
+  const buyer = await prisma.buyer.findUnique({ where: { email } });
+  // Mismo mensaje si el email no existe o si la contraseña está mal: no le
+  // damos pistas a quien intenta adivinar cuentas.
+  if (!buyer) return { error: "Email o contraseña incorrectos." };
 
-  return { sent: true };
+  const valid = await verifyPassword(password, buyer.passwordHash);
+  if (!valid) return { error: "Email o contraseña incorrectos." };
+
+  await createBuyerSession(buyer.id);
+  redirect("/cuenta");
 }
