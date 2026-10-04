@@ -78,7 +78,7 @@ export function StaffRow({ staff }: { staff: StaffData }) {
       {resetState && "ok" in resetState && (
         <div className="mt-3 rounded-lg border border-accent/30 bg-accent/10 p-3 text-sm">
           <p className="text-accent">
-            Nueva contraseña — pasásela ahora, no se vuelve a mostrar:
+            Nueva contraseña — pásasela ahora, no se vuelve a mostrar:
           </p>
           <p className="mt-1 font-mono text-base tracking-wide">
             {resetState.password}

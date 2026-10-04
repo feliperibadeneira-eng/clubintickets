@@ -122,7 +122,7 @@ export function Scanner({
         {cameraError && (
           <div className="flex flex-col items-center gap-2 p-6 text-center text-sm text-danger">
             <CameraOff size={22} />
-            No pudimos acceder a la cámara: {cameraError}. Revisá los
+            No pudimos acceder a la cámara: {cameraError}. Revisa los
             permisos de cámara del navegador para este sitio.
           </div>
         )}

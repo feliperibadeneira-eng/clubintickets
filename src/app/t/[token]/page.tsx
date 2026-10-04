@@ -92,7 +92,7 @@ export default async function TicketPage({
       </div>
 
       <p className="mt-5 text-center text-xs text-muted">
-        Esta entrada es intransferible. Presentá este código QR en la puerta
+        Esta entrada es intransferible. Presenta este código QR en la puerta
         junto con tu documento de identidad.
       </p>
     </main>

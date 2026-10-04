@@ -119,7 +119,7 @@ export function CheckoutForm({
       </div>
       <p className="mt-2 text-right text-xs text-muted">
         Al continuar, tus entradas quedan reservadas por 10 minutos mientras
-        completás el pago.
+        completas el pago.
       </p>
     </form>
   );

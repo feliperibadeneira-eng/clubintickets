@@ -76,11 +76,11 @@ DATABASE_URL="<la de producción>" npx tsx prisma/create-first-organizer.ts \
   "Nombre de tu negocio" "Tu nombre" "tu@email.com"
 ```
 
-Te va a mostrar una contraseña generada, una sola vez — guardala y
-entrá con esa cuenta en `/login`. Es seguro correrlo una sola vez: si
+Te va a mostrar una contraseña generada, una sola vez — guárdala y
+entra con esa cuenta en `/login`. Es seguro correrlo una sola vez: si
 ya existe una organización, no hace nada (para no crear duplicados por
-error). Si más adelante querés otra cuenta de organizador, se hace
-distinto — avisale a Claude, hoy esto no tiene pantalla propia porque
+error). Si más adelante quieres otra cuenta de organizador, se hace
+distinto — avísale a Claude, hoy esto no tiene pantalla propia porque
 el MVP asume un solo organizador (ver `SPEC.md`).
 
 ## 7. Qué queda pendiente después de esto

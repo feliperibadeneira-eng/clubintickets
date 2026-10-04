@@ -19,7 +19,7 @@ export default async function HomePage() {
         Próximas fiestas
       </h1>
       <p className="mt-2 text-muted">
-        Elegí un evento para comprar tus entradas.
+        Elige un evento para comprar tus entradas.
       </p>
 
       <ul className="mt-8 space-y-3">

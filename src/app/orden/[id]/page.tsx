@@ -45,7 +45,7 @@ export default async function OrderPage({
           </div>
           <p className="mt-3 text-muted">
             Pasaron más de 10 minutos sin completar el pago, así que las
-            entradas volvieron a estar disponibles para otras personas. Podés
+            entradas volvieron a estar disponibles para otras personas. Puedes
             empezar de nuevo cuando quieras.
           </p>
           <Link
@@ -64,7 +64,7 @@ export default async function OrderPage({
             </h1>
           </div>
           <p className="mt-3 text-muted">
-            Tenés{" "}
+            Tienes{" "}
             <span className="font-semibold text-foreground">
               <Countdown expiresAtMs={order.expiresAt.getTime()} />
             </span>{" "}
@@ -111,7 +111,7 @@ export default async function OrderPage({
           {process.env.NODE_ENV === "production" ? (
             <div className="mt-8 rounded-2xl border border-dashed border-border bg-surface p-6 text-center text-muted">
               El cobro con PayPhone todavía se está configurando. Mientras
-              tanto, esta orden queda reservada — escribinos si necesitás
+              tanto, esta orden queda reservada — escríbenos si necesitas
               completar el pago.
             </div>
           ) : (
@@ -134,7 +134,7 @@ export default async function OrderPage({
           ) : (
             <p className="mt-3 rounded-xl border border-warning/25 bg-warning-bg p-3 text-sm text-warning">
               Tu pago está confirmado, pero no pudimos enviarte el email con
-              las entradas. No hay problema: podés verlas y guardarlas desde
+              las entradas. No hay problema: puedes verlas y guardarlas desde
               acá abajo.
             </p>
           )}

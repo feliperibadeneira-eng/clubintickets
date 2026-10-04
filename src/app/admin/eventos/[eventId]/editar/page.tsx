@@ -39,7 +39,7 @@ export default async function EditEventPage({
 
       {nuevo === "1" && (
         <p className="mt-3 rounded-xl border border-accent/25 bg-accent/10 p-3 text-sm text-accent">
-          ¡Evento creado! Ahora agregale al menos un tipo de entrada con un
+          ¡Evento creado! Ahora agrégale al menos un tipo de entrada con un
           precio para poder publicarlo.
         </p>
       )}

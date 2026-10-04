@@ -80,7 +80,7 @@ export async function createEvent(
   const venue = await prisma.venue.findFirst({
     where: { id: input.venueId, organizationId },
   });
-  if (!venue) return { ok: false, error: "Elegí una sede válida." };
+  if (!venue) return { ok: false, error: "Elige una sede válida." };
 
   const startsAt = parseEcuadorDateTime(input.startsAtLocal);
   if (!startsAt) return { ok: false, error: "Falta la fecha de inicio." };
@@ -122,7 +122,7 @@ export async function updateEvent(
   const venue = await prisma.venue.findFirst({
     where: { id: input.venueId, organizationId },
   });
-  if (!venue) return { ok: false, error: "Elegí una sede válida." };
+  if (!venue) return { ok: false, error: "Elige una sede válida." };
 
   const startsAt = parseEcuadorDateTime(input.startsAtLocal);
   if (!startsAt) return { ok: false, error: "Falta la fecha de inicio." };
@@ -162,7 +162,7 @@ export async function setEventStatus(
       return {
         ok: false,
         error:
-          "Agregá al menos un tipo de entrada con un precio antes de publicar.",
+          "Agrega al menos un tipo de entrada con un precio antes de publicar.",
       };
     }
   }
@@ -250,7 +250,7 @@ export async function updateTicketType(
   if (input.totalStock < alreadyCommitted) {
     return {
       ok: false,
-      error: `Ya hay ${alreadyCommitted} vendidas o reservadas — no podés bajar el stock de ese número.`,
+      error: `Ya hay ${alreadyCommitted} vendidas o reservadas — no puedes bajar el stock de ese número.`,
     };
   }
 
@@ -279,7 +279,7 @@ export async function deleteTicketType(
     return {
       ok: false,
       error:
-        "No se puede borrar: ya tiene ventas. Si querés, poné el stock en 0 para dejar de venderlo.",
+        "No se puede borrar: ya tiene ventas. Si quieres, pon el stock en 0 para dejar de venderlo.",
     };
   }
 

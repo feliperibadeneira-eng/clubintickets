@@ -14,7 +14,7 @@ export async function login(
     .trim()
     .toLowerCase();
   const password = String(formData.get("password") ?? "");
-  if (!email || !password) return { error: "Completá usuario y contraseña." };
+  if (!email || !password) return { error: "Completa usuario y contraseña." };
 
   const user = await prisma.user.findUnique({ where: { email } });
   // Mismo mensaje si el usuario no existe o si la contraseña está mal:

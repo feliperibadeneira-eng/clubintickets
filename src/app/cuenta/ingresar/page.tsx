@@ -19,13 +19,13 @@ export default async function BuyerLoginPage() {
         </div>
         <h1 className="mt-4 text-2xl font-bold tracking-tight">Mi cuenta</h1>
         <p className="mt-1 text-sm text-muted">
-          Entrá con tu email y contraseña.
+          Entra con tu email y contraseña.
         </p>
         <LoginForm />
         <p className="mt-5 text-center text-sm text-muted">
-          ¿No tenés cuenta?{" "}
+          ¿No tienes cuenta?{" "}
           <Link href="/cuenta/registro" className="text-accent hover:underline">
-            Creá una
+            Crea una
           </Link>
         </p>
       </Card>

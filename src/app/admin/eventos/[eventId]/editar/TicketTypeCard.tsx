@@ -187,7 +187,7 @@ export function TicketTypeCard({
             <Input name="endsAt" type="datetime-local" />
           </div>
           <p className="mt-1.5 text-xs text-muted">
-            Dejá las fechas vacías para que no tenga límite por ese lado.
+            Deja las fechas vacías para que no tenga límite por ese lado.
           </p>
           {tierState && "error" in tierState && (
             <p className="mt-2 text-sm text-danger">{tierState.error}</p>

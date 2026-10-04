@@ -15,7 +15,7 @@ export async function loginBuyer(
     .trim()
     .toLowerCase();
   const password = String(formData.get("password") ?? "");
-  if (!email || !password) return { error: "Completá email y contraseña." };
+  if (!email || !password) return { error: "Completa email y contraseña." };
 
   const buyer = await prisma.buyer.findUnique({ where: { email } });
   // Mismo mensaje si el email no existe o si la contraseña está mal: no le

@@ -13,7 +13,7 @@ export async function submitOrder(
 ): Promise<CheckoutFormState> {
   const buyerName = String(formData.get("buyerName") ?? "");
   const buyerEmail = String(formData.get("buyerEmail") ?? "");
-  if (buyerName.trim().length < 3) return { error: "Escribí tu nombre." };
+  if (buyerName.trim().length < 3) return { error: "Escribe tu nombre." };
   if (!/^\S+@\S+\.\S+$/.test(buyerEmail.trim()))
     return { error: "El email no parece válido." };
 

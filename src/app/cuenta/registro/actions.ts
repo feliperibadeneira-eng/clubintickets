@@ -17,14 +17,14 @@ export async function registerBuyer(
     .toLowerCase();
   const password = String(formData.get("password") ?? "");
 
-  if (name.length < 3) return { error: "Escribí tu nombre completo." };
-  if (!email) return { error: "Escribí tu email." };
+  if (name.length < 3) return { error: "Escribe tu nombre completo." };
+  if (!email) return { error: "Escribe tu email." };
   if (password.length < 8)
     return { error: "La contraseña tiene que tener al menos 8 caracteres." };
 
   const existing = await prisma.buyer.findUnique({ where: { email } });
   if (existing)
-    return { error: "Ya existe una cuenta con ese email — iniciá sesión." };
+    return { error: "Ya existe una cuenta con ese email — inicia sesión." };
 
   const buyer = await prisma.buyer.create({
     data: { name, email, passwordHash: await hashPassword(password) },

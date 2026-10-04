@@ -12,7 +12,7 @@ export async function updateBuyerProfile(
 ): Promise<UpdateProfileState> {
   const buyer = await requireBuyer();
   const name = String(formData.get("name") ?? "").trim();
-  if (name.length < 3) return { error: "Escribí tu nombre completo." };
+  if (name.length < 3) return { error: "Escribe tu nombre completo." };
 
   await prisma.buyer.update({ where: { id: buyer.id }, data: { name } });
   return { ok: true };

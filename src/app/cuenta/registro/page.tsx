@@ -18,16 +18,16 @@ export default async function BuyerRegisterPage() {
           <UserPlus size={20} />
         </div>
         <h1 className="mt-4 text-2xl font-bold tracking-tight">
-          Creá tu cuenta
+          Crea tu cuenta
         </h1>
         <p className="mt-1 text-sm text-muted">
           No hace falta haber comprado una entrada todavía.
         </p>
         <RegisterForm />
         <p className="mt-5 text-center text-sm text-muted">
-          ¿Ya tenés cuenta?{" "}
+          ¿Ya tienes cuenta?{" "}
           <Link href="/cuenta/ingresar" className="text-accent hover:underline">
-            Iniciá sesión
+            Inicia sesión
           </Link>
         </p>
       </Card>

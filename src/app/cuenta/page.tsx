@@ -56,7 +56,7 @@ export default async function BuyerAccountPage() {
 
       {orders.length === 0 ? (
         <Card className="mt-3 text-center text-sm text-muted">
-          Todavía no tenés compras con este email.
+          Todavía no tienes compras con este email.
         </Card>
       ) : (
         <ul className="mt-3 space-y-3">

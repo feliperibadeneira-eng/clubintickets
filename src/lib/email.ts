@@ -66,7 +66,7 @@ export async function sendTicketsEmail(
       </p>
       <p>¡Gracias por tu compra, ${escapeHtml(order.buyerName)}! Total pagado: ${formatUSD(order.totalCents)}.</p>
       <p style="color:#666;font-size:14px;">
-        Presentá el código QR de cada entrada en la puerta, junto con tu
+        Presenta el código QR de cada entrada en la puerta, junto con tu
         documento de identidad. Cada entrada es intransferible.
       </p>
       ${ticketsHtml}

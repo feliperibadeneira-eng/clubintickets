@@ -19,8 +19,8 @@ export default async function NewEventPage() {
       </Link>
       <h1 className="mt-2 text-2xl font-bold tracking-tight">Nuevo evento</h1>
       <p className="mt-1 text-sm text-muted">
-        Se crea como borrador. Después le agregás los tipos de entrada y
-        recién ahí lo publicás.
+        Se crea como borrador. Después le agregas los tipos de entrada y
+        recién ahí lo publicas.
       </p>
 
       <NewEventForm venues={venues} />

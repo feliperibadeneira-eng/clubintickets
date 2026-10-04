@@ -49,7 +49,7 @@ async function main() {
   const existing = await prisma.organization.findFirst();
   if (existing) {
     console.error(
-      `Ya existe una organización ("${existing.name}") — no se creó nada nuevo. Si querés agregar otra cuenta de organizador, hacelo desde /admin en vez de este script.`,
+      `Ya existe una organización ("${existing.name}") — no se creó nada nuevo. Si quieres agregar otra cuenta de organizador, hazlo desde /admin en vez de este script.`,
     );
     process.exit(1);
   }
@@ -75,7 +75,7 @@ async function main() {
   console.log(`  Contraseña: ${password}`);
   console.log("");
   console.log(
-    "Guardala ahora — no se vuelve a mostrar. Entrá en /login y creá tu primer evento desde /admin.",
+    "Guárdala ahora — no se vuelve a mostrar. Entra en /login y crea tu primer evento desde /admin.",
   );
 }
 

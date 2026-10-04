@@ -20,7 +20,7 @@ export default async function LoginPage() {
         </div>
         <h1 className="mt-4 text-2xl font-bold tracking-tight">Ingresar</h1>
         <p className="mt-1 text-sm text-muted">
-          Usá tu usuario y contraseña de organizador o de staff.
+          Usa tu usuario y contraseña de organizador o de staff.
         </p>
         <LoginForm />
       </Card>
