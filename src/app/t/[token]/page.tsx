@@ -39,7 +39,7 @@ export default async function TicketPage({
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 py-10">
       <div className="overflow-hidden rounded-3xl border border-border bg-surface">
-        <div className="bg-gradient-to-br from-accent/25 via-surface to-surface p-6 text-center">
+        <div className="bg-accent/10 p-6 text-center">
           <p className="text-sm font-medium text-accent">
             {ticket.ticketType.name}
           </p>

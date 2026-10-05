@@ -58,7 +58,7 @@ export default async function EventPage({
 
   return (
     <main className="flex-1">
-      <div className="border-b border-border/60 bg-gradient-to-br from-accent/20 via-background to-background px-4 py-12">
+      <div className="border-b border-border/60 bg-background-alt px-4 py-12">
         <div className="mx-auto w-full max-w-2xl">
           <p className="text-sm font-medium text-accent">
             {event.organization.name}
