@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ticketera",
+  title: "Clubin Tickets",
   description: "Entradas para las mejores fiestas",
 };
 
@@ -30,7 +30,7 @@ export default function RootLayout({
       lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="ambient-glow flex min-h-full flex-col">
+      <body className="flex min-h-full flex-col">
         <header className="flex items-center justify-between border-b border-border/60 px-4 py-3.5">
           <Brand />
           <Link
