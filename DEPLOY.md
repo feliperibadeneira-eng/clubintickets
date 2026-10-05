@@ -5,12 +5,12 @@ cada `git push` a `main` despliega solo.
 
 ## 1. Subir el código a GitHub
 
-1. En [github.com](https://github.com/new), creá un repositorio nuevo
+1. En [github.com](https://github.com/new), crea un repositorio nuevo
    (por ejemplo `ticketera`). Puede ser privado.
 2. En **Settings → SSH and GPG keys → New SSH key** de tu cuenta de
-   GitHub, pegá la clave pública que te haya pasado Claude para esta
+   GitHub, pega la clave pública que te haya pasado Claude para esta
    máquina.
-3. Conectá el repo local:
+3. Conecta el repo local:
    ```bash
    git remote add origin git@github.com:TU-USUARIO/ticketera.git
    git push -u origin main
@@ -19,7 +19,7 @@ cada `git push` a `main` despliega solo.
 ## 2. Crear el proyecto en Vercel
 
 1. En [vercel.com](https://vercel.com/new), **Add New → Project** y
-   elegí el repositorio de GitHub que acabás de crear.
+   elige el repositorio de GitHub que acabas de crear.
 2. Vercel detecta Next.js solo — no hace falta tocar la configuración
    de build.
 3. Todavía no le des a "Deploy": primero hay que cargar la base de
@@ -34,19 +34,19 @@ Database** → Postgres. Se conecta solo y ya te arma la variable
 `DATABASE_URL` en el proyecto — no hay que copiarla a mano.
 
 Alternativas igual de válidas: [Neon](https://neon.tech) o
-[Prisma Postgres](https://www.prisma.io/postgres) (creás la base ahí y
-pegás la `DATABASE_URL` vos mismo en el paso 4).
+[Prisma Postgres](https://www.prisma.io/postgres) (creas la base ahí y
+pegas la `DATABASE_URL` tú mismo en el paso 4).
 
 ## 4. Variables de entorno en Vercel
 
-En **Settings → Environment Variables** del proyecto, agregá (con el
+En **Settings → Environment Variables** del proyecto, agrega (con el
 mismo nombre que en `.env.example`):
 
 | Variable | Valor |
 |---|---|
 | `DATABASE_URL` | La da tu proveedor de base de datos (paso 3) |
-| `RESEND_API_KEY` | Tu API key de Resend |
-| `EMAIL_FROM` | `Ticketera <onboarding@resend.dev>` (o tu dominio verificado) |
+| `GMAIL_USER` | La cuenta de Gmail desde la que se mandan los emails |
+| `GMAIL_APP_PASSWORD` | Contraseña de aplicación generada en myaccount.google.com/apppasswords |
 | `NEXT_PUBLIC_BASE_URL` | Tu URL de Vercel, ej: `https://ticketera-tunombre.vercel.app` |
 
 `SHADOW_DATABASE_URL` **no** hace falta en producción, solo en tu
@@ -54,7 +54,7 @@ computadora para desarrollo.
 
 ## 5. Desplegar
 
-Con las variables cargadas, **Deploy** (o hacé un `git push` si ya
+Con las variables cargadas, **Deploy** (o haz un `git push` si ya
 habías desplegado antes). Vercel va a:
 
 1. Instalar dependencias y generar el cliente de Prisma.
@@ -67,8 +67,8 @@ habías desplegado antes). Vercel va a:
 
 La base de producción arranca vacía (no corre el `seed` de desarrollo,
 que es solo para probar). Para crear tu primera cuenta de organizador,
-corré esto una vez desde tu computadora, apuntando a la base de
-producción (la `DATABASE_URL` la copiás desde Vercel → Storage → tu
+corre esto una vez desde tu computadora, apuntando a la base de
+producción (la `DATABASE_URL` la copias desde Vercel → Storage → tu
 base → `.env.local` tab, o desde tu proveedor si usaste otro):
 
 ```bash
@@ -89,8 +89,10 @@ el MVP asume un solo organizador (ver `SPEC.md`).
   a propósito (ver `src/lib/orders.ts`). Hasta que conectes PayPhone,
   las compras quedan reservadas pero nadie puede "pagarlas" gratis.
 - **Dominio propio**: opcional. En **Settings → Domains** del proyecto
-  de Vercel podés agregar el tuyo cuando quieras — no hace falta
+  de Vercel puedes agregar el tuyo cuando quieras — no hace falta
   redesplegar nada.
-- **Emails a compradores reales**: mientras no verifiques un dominio
-  en Resend, los emails solo llegan a tu propia casilla (ver
-  `SPEC.md` sección 5).
+- **Emails desde Gmail**: por ahora se mandan desde una cuenta de Gmail
+  normal con contraseña de aplicación — funciona para el volumen de
+  un evento, pero tiene límites diarios de Google. Cuando tengas un
+  dominio propio, conviene pasar a un proveedor transaccional (Resend,
+  SendGrid) para mejor entregabilidad y sin esos límites.

@@ -1,14 +1,23 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { prisma } from "@/lib/db";
 import { formatEventDate, formatUSD } from "@/lib/pricing";
 import { ticketQrBuffer, ticketUrl } from "@/lib/qr";
 
-// Remitente de pruebas de Resend. Solo entrega a la casilla con la que te
-// registraste en Resend hasta que verifiques un dominio propio — normal
-// para esta etapa. El día que tengas un dominio, cambiá EMAIL_FROM en .env
-// (por ejemplo: "Noche de Verano <entradas@tudiscoteca.com>") y esta
-// función no necesita ningún otro cambio.
-const FROM = process.env.EMAIL_FROM ?? "Ticketera <onboarding@resend.dev>";
+// Mandamos los emails desde una cuenta de Gmail normal (con una
+// "contraseña de aplicación", no la contraseña real de la cuenta) mientras
+// no haya un dominio propio verificado en un proveedor de emails
+// transaccional. El día que lo haya, esta función se puede volver a
+// cambiar a Resend/SendGrid sin tocar nada del resto del sistema.
+const GMAIL_USER = process.env.GMAIL_USER;
+const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
+const FROM = GMAIL_USER ? `Ticketera <${GMAIL_USER}>` : undefined;
+
+function getTransporter() {
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: { user: GMAIL_USER, pass: GMAIL_APP_PASSWORD },
+  });
+}
 
 export type SendTicketsResult =
   | { ok: true }
@@ -20,8 +29,11 @@ export type SendTicketsResult =
 export async function sendTicketsEmail(
   orderId: string,
 ): Promise<SendTicketsResult> {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return { ok: false, error: "Falta configurar RESEND_API_KEY." };
+  if (!GMAIL_USER || !GMAIL_APP_PASSWORD)
+    return {
+      ok: false,
+      error: "Falta configurar GMAIL_USER y GMAIL_APP_PASSWORD.",
+    };
 
   const order = await prisma.order.findUnique({
     where: { id: orderId },
@@ -33,8 +45,6 @@ export async function sendTicketsEmail(
   if (!order) return { ok: false, error: "La orden no existe." };
   if (order.status !== "PAID")
     return { ok: false, error: "La orden todavía no está pagada." };
-
-  const resend = new Resend(apiKey);
 
   const qrImages = await Promise.all(
     order.tickets.map(async (t) => ({
@@ -73,7 +83,7 @@ export async function sendTicketsEmail(
     </div>`;
 
   try {
-    const { error } = await resend.emails.send({
+    await getTransporter().sendMail({
       from: FROM,
       to: order.buyerEmail,
       subject: `Tus entradas para ${order.event.name}`,
@@ -81,10 +91,9 @@ export async function sendTicketsEmail(
       attachments: qrImages.map(({ buffer }, i) => ({
         filename: `entrada-${i + 1}.png`,
         content: buffer,
-        contentId: `qr-${i}`,
+        cid: `qr-${i}`,
       })),
     });
-    if (error) return { ok: false, error: error.message };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : String(e) };
   }
