@@ -265,3 +265,32 @@ export async function confirmTestPayment(
   const emailResult = await sendTicketsEmail(orderId);
   return emailResult.ok ? { ok: true } : { ok: true, emailError: emailResult.error };
 }
+
+export type RefundResult = { ok: true } | { ok: false; error: string };
+
+// Reembolso manual (SPEC.md sección 7): no mueve plata real, solo registra
+// que esta orden ya no vale — sus entradas pasan a REFUNDED y dejan de
+// poder escanearse en la puerta (ver src/lib/checkin.ts).
+export async function refundOrder(
+  orderId: string,
+  organizationId: string,
+): Promise<RefundResult> {
+  const order = await prisma.order.findFirst({
+    where: { id: orderId, event: { organizationId } },
+  });
+  if (!order) return { ok: false, error: "La orden no existe." };
+  if (order.status !== "PAID")
+    return { ok: false, error: "Solo se pueden reembolsar órdenes pagadas." };
+
+  await prisma.$transaction([
+    prisma.order.update({
+      where: { id: orderId },
+      data: { status: "REFUNDED" },
+    }),
+    prisma.ticket.updateMany({
+      where: { orderId },
+      data: { status: "REFUNDED" },
+    }),
+  ]);
+  return { ok: true };
+}
