@@ -8,9 +8,14 @@ export const dynamic = "force-dynamic";
 
 // Login compartido: organizador y staff usan el mismo formulario, y cada
 // uno termina en su propia pantalla según su rol (ver login/actions.ts).
-export default async function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ recuperada?: string }>;
+}) {
   const user = await getCurrentUser();
   if (user) redirect(user.role === "ORGANIZER" ? "/admin" : "/staff/scan");
+  const { recuperada } = await searchParams;
 
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-4 py-10">
@@ -22,6 +27,11 @@ export default async function LoginPage() {
         <p className="mt-1 text-sm text-muted">
           Usa tu usuario y contraseña de organizador o de staff.
         </p>
+        {recuperada && (
+          <p className="mt-4 rounded-xl border border-success/25 bg-success-bg p-3 text-sm text-success">
+            Tu contraseña se actualizó. Ya puedes entrar con la nueva.
+          </p>
+        )}
         <LoginForm />
       </Card>
     </main>

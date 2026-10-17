@@ -51,10 +51,31 @@ model User {
   active         Boolean  @default(true)
   createdAt      DateTime @default(now())
 
+  // Intentos de login fallidos seguidos; se resetea en un login exitoso.
+  // Pasado el límite, la cuenta queda bloqueada hasta lockedUntil (ver
+  // src/lib/loginThrottle.ts).
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+
   organization  Organization @relation(fields: [organizationId], references: [id])
   sessions      Session[]
   checkIns      CheckIn[]
   ticketsScanned Ticket[]    @relation("TicketUsedBy")
+  passwordResetTokens PasswordResetToken[]
+}
+
+// Link de un solo uso para que organizador/staff recuperen su contraseña
+// si la olvidan (ver src/app/login/recuperar).
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
 
 // Una sesión iniciada: la cookie del navegador solo guarda este id al azar.
@@ -79,6 +100,10 @@ model Buyer {
   passwordHash String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  // Mismo mecanismo de bloqueo por intentos fallidos que User.
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
 
   sessions BuyerSession[]
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { login, type LoginState } from "./actions";
 import { Input, Label } from "@/components/ui/Input";
@@ -24,7 +25,15 @@ export function LoginForm() {
         />
       </div>
       <div>
-        <Label htmlFor="password">Contraseña</Label>
+        <div className="flex items-baseline justify-between">
+          <Label htmlFor="password">Contraseña</Label>
+          <Link
+            href="/login/recuperar"
+            className="mb-1.5 text-xs text-accent hover:underline"
+          >
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </div>
         <Input
           id="password"
           name="password"
