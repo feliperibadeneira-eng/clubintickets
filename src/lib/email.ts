@@ -84,8 +84,12 @@ export async function sendTicketsEmail(
         contentId: `qr-${i}`,
       })),
     });
-    if (error) return { ok: false, error: error.message };
+    if (error) {
+      console.error(`[email] fallo al mandar entradas de la orden ${orderId}:`, error.message);
+      return { ok: false, error: error.message };
+    }
   } catch (e) {
+    console.error(`[email] excepción al mandar entradas de la orden ${orderId}:`, e);
     return { ok: false, error: e instanceof Error ? e.message : String(e) };
   }
 
@@ -93,6 +97,54 @@ export async function sendTicketsEmail(
     where: { id: orderId },
     data: { emailSentAt: new Date() },
   });
+  return { ok: true };
+}
+
+export type SendPasswordResetResult =
+  | { ok: true }
+  | { ok: false; error: string };
+
+// Manda el link de "olvidé mi contraseña" (ver src/app/login/recuperar).
+export async function sendPasswordResetEmail(
+  to: string,
+  name: string,
+  resetUrl: string,
+): Promise<SendPasswordResetResult> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return { ok: false, error: "Falta configurar RESEND_API_KEY." };
+
+  const resend = new Resend(apiKey);
+  const html = `
+    <div style="font-family:sans-serif;max-width:480px;margin:0 auto;">
+      <h1 style="font-size:20px;">Recuperar tu contraseña</h1>
+      <p>Hola ${escapeHtml(name)}, usa este link para elegir una contraseña nueva:</p>
+      <p style="margin:24px 0;">
+        <a href="${resetUrl}" style="display:inline-block;background:#111;color:#fff;padding:12px 20px;border-radius:999px;text-decoration:none;">
+          Elegir nueva contraseña
+        </a>
+      </p>
+      <p style="color:#666;font-size:13px;">
+        Este link vale por 30 minutos y es de un solo uso. Si no lo
+        pediste tú, puedes ignorar este email — tu contraseña actual sigue
+        funcionando igual.
+      </p>
+    </div>`;
+
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM,
+      to,
+      subject: "Recuperar tu contraseña",
+      html,
+    });
+    if (error) {
+      console.error(`[email] fallo al mandar reset de contraseña a ${to}:`, error.message);
+      return { ok: false, error: error.message };
+    }
+  } catch (e) {
+    console.error(`[email] excepción al mandar reset de contraseña a ${to}:`, e);
+    return { ok: false, error: e instanceof Error ? e.message : String(e) };
+  }
   return { ok: true };
 }
 

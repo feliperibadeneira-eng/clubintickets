@@ -49,6 +49,7 @@ export type TicketTypeSummary = {
 
 export type AttendeeRow = {
   ticketId: string;
+  orderId: string;
   attendeeName: string;
   attendeeIdNumber: string;
   ticketTypeName: string;
@@ -144,6 +145,7 @@ export async function getEventDashboard(
 
   const attendees: AttendeeRow[] = tickets.map((t) => ({
     ticketId: t.id,
+    orderId: t.orderId,
     attendeeName: t.attendeeName,
     attendeeIdNumber: t.attendeeIdNumber,
     ticketTypeName: t.ticketType.name,

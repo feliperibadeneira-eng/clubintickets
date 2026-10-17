@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { buttonClasses } from "@/components/ui/Button";
 import { LiveRefresh } from "./LiveRefresh";
+import { RefundButton } from "./RefundButton";
 
 export const dynamic = "force-dynamic";
 
@@ -131,6 +132,7 @@ export default async function EventDashboardPage({
               <th className="p-3 font-medium">Cédula</th>
               <th className="p-3 font-medium">Tipo</th>
               <th className="p-3 font-medium">Ingreso</th>
+              <th className="p-3 font-medium"></th>
             </tr>
           </thead>
           <tbody>
@@ -146,11 +148,14 @@ export default async function EventDashboardPage({
                     <span className="text-muted-2">No</span>
                   )}
                 </td>
+                <td className="p-3 text-right">
+                  <RefundButton eventId={event.id} orderId={a.orderId} />
+                </td>
               </tr>
             ))}
             {attendees.length === 0 && (
               <tr>
-                <td colSpan={4} className="p-8 text-center text-muted">
+                <td colSpan={5} className="p-8 text-center text-muted">
                   Todavía no hay entradas vendidas.
                 </td>
               </tr>
